@@ -1,4 +1,4 @@
-# Escobar
+# Escobar [![Build Status](https://travis-ci.org/atmos/escobar.svg?branch=master)](https://travis-ci.org/atmos/escobar)
 
 Escobar is an attempt to combine Heroku Pipelines with GitHub Deployments API.
 
