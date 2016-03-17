@@ -8,17 +8,21 @@ module Escobar
     attr_reader :github, :heroku
     def initialize(github_token, heroku_token)
       @github = Escobar::GitHub.new(github_token)
-      @heroku = Escobar::Heroku.new(heroku_token)
+      @heroku = Escobar::Heroku::Client.new(heroku_token)
     end
 
-    def apps
-      pipelines.map do |pipeline|
-        { id: pipeline.id, name: pipeline.name }
-      end
+    def [](key)
+      pipelines.find { |pipeline| pipeline.name == key }
+    end
+
+    def app_names
+      pipelines.map(&:name)
     end
 
     def pipelines
-      heroku.get("/pipelines")
+      @pipelines ||= heroku.get("/pipelines").map do |pipe|
+        Escobar::Heroku::Pipeline.new(heroku, pipe["id"], pipe["name"])
+      end
     end
   end
 end

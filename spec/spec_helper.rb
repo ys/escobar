@@ -1,10 +1,12 @@
 $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "escobar"
+require "fileutils"
 require "pry"
 require "uuid"
 require "webmock/rspec"
 
 tmp_directory = File.expand_path("../../tmp", __FILE__)
+FileUtils.mkdir_p tmp_directory
 ENV["NETRC"] = tmp_directory
 
 RSpec.configure do |config|
@@ -20,6 +22,7 @@ RSpec.configure do |config|
   end
 
   config.before do
+    WebMock.reset!
     WebMock.disable_net_connect!
     ENV["NETRC"] = tmp_directory
   end
@@ -43,5 +46,18 @@ RSpec.configure do |config|
         "password" => Digest::SHA1.hexdigest(Time.now.to_f.to_s)
       }
     }
+  end
+
+  def fixture_path
+    "#{File.expand_path('../..', __FILE__)}/spec/fixtures"
+  end
+
+  def fixture_data(name)
+    path = File.join(fixture_path, "#{name}.json")
+    File.read(path)
+  end
+
+  def decoded_fixture_data(name)
+    JSON.parse(fixture_data(name))
   end
 end
