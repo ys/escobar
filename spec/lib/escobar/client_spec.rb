@@ -11,26 +11,32 @@ describe Escobar::Client do
     }
   end
 
-  def hubot_uuid
+  def default_kolkrabbi_headers
+    {
+      "Accept"          => "*/*",
+      "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+      "Authorization"   => "Bearer #{Escobar.heroku_api_token}",
+      "Content-Type"    => "application/json",
+      "User-Agent"      => "Faraday v0.9.2"
+    }
   end
 
-  def slash_heroku_uuid
-  end
-
-  def stub_path_with_response(path, response)
+  def stub_heroku_response(path)
     stub_request(:get, "https://api.heroku.com#{path}")
       .with(headers: default_heroku_headers)
-      .to_return(status: 200, body: response, headers: {})
+      .to_return(status: 200, body: fixture_data("heroku#{path}"))
   end
 
-  def heroku_fixture_data(file)
-    fixture_data("heroku#{file}")
+  def stub_kolkrabbi_response(path)
+    stub_request(:get, "https://kolkrabbit.com#{path}")
+      .with(headers: default_kolkrabbi_headers)
+      .to_return(status: 200, body: fixture_data("kolkrabbi#{path}"))
   end
 
   let(:client) { Escobar::Client.from_environment }
 
   before do
-    stub_path_with_response("/pipelines", heroku_fixture_data("/pipelines"))
+    stub_heroku_response("/pipelines")
   end
 
   describe "pipelines" do
@@ -45,13 +51,13 @@ describe Escobar::Client do
   # rubocop:disable Metrics/LineLength
   describe "multi-environment pipelines" do
     it "loads basic information about your apps from pipelines" do
-      stub_path_with_response("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111",
-                              heroku_fixture_data("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111"))
-      stub_path_with_response("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111/pipeline-couplings",
-                              heroku_fixture_data("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111/pipeline-couplings"))
+      stub_heroku_response("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111")
+      stub_heroku_response("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111/pipeline-couplings")
+      stub_kolkrabbi_response("/pipelines/531a6f90-bd76-4f5c-811f-acc8a9f4c111/repository")
 
       pipeline = client["hubot"]
       expect(pipeline.name).to eql("hubot")
+      expect(pipeline.github_repository).to eql("atmos/hubot")
       expect(pipeline.couplings.size).to eql(1)
       expect(pipeline.couplings.first.name).to eql("production")
     end
@@ -59,13 +65,13 @@ describe Escobar::Client do
 
   describe "single-environment pipelines" do
     it "loads basic information about your apps from pipelines" do
-      stub_path_with_response("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc",
-                              heroku_fixture_data("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc"))
-      stub_path_with_response("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc/pipeline-couplings",
-                              heroku_fixture_data("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc/pipeline-couplings"))
+      stub_heroku_response("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc")
+      stub_heroku_response("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc/pipeline-couplings")
+      stub_kolkrabbi_response("/pipelines/4c18c922-6eee-451c-b7c6-c76278652ccc/repository")
 
       pipeline = client["slash-heroku"]
       expect(pipeline.name).to eql("slash-heroku")
+      expect(pipeline.github_repository).to eql("atmos/slash-heroku")
       expect(pipeline.couplings.size).to eql(2)
       expect(pipeline.couplings.first.name).to eql("production")
       expect(pipeline.couplings.last.name).to eql("staging")

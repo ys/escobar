@@ -17,6 +17,14 @@ module Escobar
         end
       end
 
+      def repository
+        @repository ||= get("/pipelines/#{id}/repository")
+      end
+
+      def github_repository
+        repository["repository"] && repository["repository"]["name"]
+      end
+
       def couplings
         @couplings ||= couplings!
       end
@@ -25,6 +33,20 @@ module Escobar
         client.get("/pipelines/#{id}/pipeline-couplings").map do |coupling|
           Escobar::Heroku::Coupling.new(client, coupling)
         end
+      end
+
+      def get(path)
+        response = kolkrabbi.get do |request|
+          request.url path
+          request.headers["Content-Type"]  = "application/json"
+          request.headers["Authorization"] = "Bearer #{client.token}"
+        end
+
+        JSON.parse(response.body)
+      end
+
+      def kolkrabbi
+        @kolkrabbi ||= Faraday.new(url: "https://#{ENV['KOLKRABBI_HOSTNAME']}")
       end
     end
   end

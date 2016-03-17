@@ -8,6 +8,7 @@ require "webmock/rspec"
 tmp_directory = File.expand_path("../../tmp", __FILE__)
 FileUtils.mkdir_p tmp_directory
 ENV["NETRC"] = tmp_directory
+ENV["KOLKRABBI_HOSTNAME"] = "kolkrabbit.com"
 
 RSpec.configure do |config|
   config.include(WebMock::API)
