@@ -9,6 +9,13 @@ module Escobar
         @client       = client
       end
 
+      def each_environment
+        sorted_environmens = environments.keys.sort
+        sorted_environmens.each do |environment|
+          yield(environment, environments[environment])
+        end
+      end
+
       def environments
         @environments ||= couplings.each_with_object({}) do |part, sum|
           sum[part.name] ||= []

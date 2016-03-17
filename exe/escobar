@@ -9,7 +9,7 @@ client.app_names.sort.each do |application_name|
   puts "#{application_name}:"
 
   pipeline = client[application_name]
-  pipeline.environments.each do |name, apps|
+  pipeline.each_environment do |name, apps|
     names = apps.map { |app| app.app.name }
     puts "  #{name}: #{names.join(',')}"
   end
