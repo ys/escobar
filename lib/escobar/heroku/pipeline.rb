@@ -9,11 +9,8 @@ module Escobar
         @client       = client
       end
 
-      def each_environment
-        sorted_environmens = environments.keys.sort
-        sorted_environmens.each do |environment|
-          yield(environment, environments[environment])
-        end
+      def sorted_environments
+        environments.keys.sort
       end
 
       def environments
