@@ -2,6 +2,7 @@
 
 require "bundler/setup"
 require "escobar"
+require "pry"
 
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
@@ -11,4 +12,9 @@ require "escobar"
 # Pry.start
 
 require "irb"
+require "irb/completion"
+require 'irb/ext/save-history'
+
+IRB.conf[:SAVE_HISTORY] = 100
+IRB.conf[:HISTORY_FILE] = "#{File.expand_path("../..", __FILE__)}/.irb.history"
 IRB.start
