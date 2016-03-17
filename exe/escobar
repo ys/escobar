@@ -5,10 +5,12 @@ require "escobar"
 
 client = Escobar::Client.from_environment
 
-client.app_names.sort.each do |name|
-  pipeline = client[name]
-  puts "#{name}:"
-  pipeline.couplings.each do |environment|
-    puts "  #{environment.name}: #{environment.app.name}"
+client.app_names.sort.each do |application_name|
+  puts "#{application_name}:"
+
+  pipeline = client[application_name]
+  pipeline.environments.each do |name, apps|
+    names = apps.map { |app| app.app.name }
+    puts "  #{name}: #{names.join(',')}"
   end
 end

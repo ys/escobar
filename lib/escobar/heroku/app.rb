@@ -18,4 +18,3 @@ module Escobar
     end
   end
 end
-

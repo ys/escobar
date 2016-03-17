@@ -10,8 +10,9 @@ module Escobar
       end
 
       def environments
-        @environments ||= couplings.each_with_object({}) do |sum, part|
-          sum[part.name] = part
+        @environments ||= couplings.each_with_object({}) do |part, sum|
+          sum[part.name] ||= []
+          sum[part.name].push(part)
           sum
         end
       end
