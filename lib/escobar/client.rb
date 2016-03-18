@@ -30,8 +30,6 @@ module Escobar
       case info["status"]
       when "succeeded", "failed"
         info
-      else
-        nil
       end
     end
   end

@@ -66,31 +66,34 @@ module Escobar
 
         archive_link = deployment.archive_link
 
-        payload = self.to_hash
-        payload[:name] = name
-        payload[:provider] = "slash-heroku"
+        app = environments[environment] && environments[environment].last
+        if app
+          payload = self.to_hash
+          payload[:name] = name
+          payload[:provider] = "slash-heroku"
 
-        github_deployment = deployment.create(payload)
-        body = {
-          source_blob: {
-            url: archive_link,
-            version: github_deployment.sha[0..7],
-            version_description: "#{deployment.repo}:#{github_deployment.sha}"
-          }
-        }
-        app = environments[environment].last
-        build = client.heroku.post("/apps/#{app.name}/builds", body)
-        if build["id"]
-          status_payload = {
-            target_url: "#{app.app.dashboard_url}/activity/builds/#{build['id']}",
-            description: "Deploying from slash-heroku"
+          github_deployment = deployment.create(payload)
+          body = {
+            source_blob: {
+              url: archive_link,
+              version: github_deployment.sha[0..7],
+              version_description: "#{deployment.repo}:#{github_deployment.sha}"
+            }
           }
 
-          deployment.create_status(github_deployment.url, "pending", status_payload)
-          {
-            app_id: app.name, build_id: build["id"],
-            deployment_url: github_deployment.url
-          }
+          build = client.heroku.post("/apps/#{app.name}/builds", body)
+          if build["id"]
+            status_payload = {
+              target_url: "#{app.app.dashboard_url}/activity/builds/#{build['id']}",
+              description: "Deploying from slash-heroku"
+            }
+
+            deployment.create_status(github_deployment.url, "pending", status_payload)
+            {
+              app_id: app.name, build_id: build["id"],
+              deployment_url: github_deployment.url
+            }
+          end
         end
       end
 
