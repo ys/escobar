@@ -31,7 +31,7 @@ module Escobar
       when "succeeded", "failed"
         info
       else
-        false
+        nil
       end
     end
   end
