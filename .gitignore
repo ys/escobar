@@ -10,3 +10,4 @@
 *.gem
 tmp/.netrc
 .irb.history
+.env

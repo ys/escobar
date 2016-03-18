@@ -15,10 +15,25 @@ module Escobar
 
       def environments
         @environments ||= couplings.each_with_object({}) do |part, sum|
-          sum[part.name] ||= []
-          sum[part.name].push(part)
+          sum[part.stage] ||= []
+          sum[part.stage].push(part)
           sum
         end
+      end
+
+      def environment_hash
+        sorted_environments.each_with_object({}) do |environment, sum|
+          sum[environment.to_sym] = environments[environment].map(&:to_hash)
+          sum
+        end
+      end
+
+      def to_hash
+        {
+          name: name,
+          github_repository: github_repository,
+          environments: environment_hash
+        }
       end
 
       def repository
