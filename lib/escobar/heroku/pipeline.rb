@@ -49,8 +49,48 @@ module Escobar
       end
 
       def couplings!
-        client.get("/pipelines/#{id}/pipeline-couplings").map do |coupling|
-          Escobar::Heroku::Coupling.new(client, coupling)
+        client.heroku.get("/pipelines/#{id}/pipeline-couplings").map do |pc|
+          Escobar::Heroku::Coupling.new(client, pc)
+        end
+      end
+
+      # rubocop:disable Metrics/AbcSize
+      # rubocop:disable Metrics/LineLength
+      # rubocop:disable Metrics/MethodLength
+      def create_deployment(ref, environment, force)
+        deployment             = Escobar::GitHub::Deployment.new(client.github.client)
+        deployment.ref         = ref
+        deployment.repo        = github_repository
+        deployment.force       = force
+        deployment.environment = environment
+
+        archive_link = deployment.archive_link
+
+        payload = self.to_hash
+        payload[:name] = name
+        payload[:provider] = "slash-heroku"
+
+        github_deployment = deployment.create(payload)
+        body = {
+          source_blob: {
+            url: archive_link,
+            version: github_deployment.sha[0..7],
+            version_description: "#{deployment.repo}:#{github_deployment.sha}"
+          }
+        }
+        app = environments[environment].last
+        build = client.heroku.post("/apps/#{app.name}/builds", body)
+        if build["id"]
+          status_payload = {
+            target_url: "#{app.app.dashboard_url}/activity/builds/#{build['id']}",
+            description: "Deploying from slash-heroku"
+          }
+
+          deployment.create_status(github_deployment.url, "pending", status_payload)
+          {
+            app_id: app.name, build_id: build["id"],
+            deployment_url: github_deployment.url
+          }
         end
       end
 
@@ -58,7 +98,7 @@ module Escobar
         response = kolkrabbi.get do |request|
           request.url path
           request.headers["Content-Type"]  = "application/json"
-          request.headers["Authorization"] = "Bearer #{client.token}"
+          request.headers["Authorization"] = "Bearer #{client.heroku.token}"
         end
 
         JSON.parse(response.body)

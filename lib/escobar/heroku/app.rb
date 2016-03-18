@@ -13,7 +13,11 @@ module Escobar
       end
 
       def info
-        @info ||= client.get("/apps/#{id}")
+        @info ||= client.heroku.get("/apps/#{id}")
+      end
+
+      def dashboard_url
+        "https://dashboard.heroku.com/apps/#{name}"
       end
     end
   end
