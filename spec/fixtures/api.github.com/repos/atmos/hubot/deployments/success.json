@@ -1,0 +1,50 @@
+{
+  "url": "https://api.github.com/repos/atmos/hubot/deployments/4303989",
+  "id": 4303989,
+  "sha": "26439af517132e32eb7cf329cd1ca4d8bad973a0",
+  "ref": "master",
+  "task": "deploy",
+  "payload": {
+    "name": "hubot",
+    "provider": "slash-heroku",
+    "pipeline": {
+      "name": "hubot",
+      "github_repository": "atmos/hubot",
+      "environments": {
+        "production": [
+          {
+            "id": "fabe5e2d-065f-49fe-9f85-0c39f83bdec9",
+            "name": "hubot",
+            "stage": "production",
+            "app_id": "27bde4b5-b431-4117-9302-e533b887faaa"
+          }
+        ]
+      }
+    }
+  },
+  "environment": "production",
+  "description": "Shipped from chat with slash-heroku",
+  "creator": {
+    "login": "atmos",
+    "id": 38,
+    "avatar_url": "https://avatars.githubusercontent.com/u/38?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/atmos",
+    "html_url": "https://github.com/atmos",
+    "followers_url": "https://api.github.com/users/atmos/followers",
+    "following_url": "https://api.github.com/users/atmos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/atmos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/atmos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/atmos/subscriptions",
+    "organizations_url": "https://api.github.com/users/atmos/orgs",
+    "repos_url": "https://api.github.com/users/atmos/repos",
+    "events_url": "https://api.github.com/users/atmos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/atmos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "created_at": "2016-03-18T22:55:37Z",
+  "updated_at": "2016-03-18T22:55:37Z",
+  "statuses_url": "https://api.github.com/repos/atmos/hubot/deployments/4303989/statuses",
+  "repository_url": "https://api.github.com/repos/atmos/hubot"
+}

@@ -54,47 +54,66 @@ module Escobar
         end
       end
 
+      def github_archive_link(ref)
+        github_client.archive_link(ref)
+      end
+
+      def github_client
+        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
+                                                       github_repository)
+      end
+
+      def create_github_deployment(task, ref, environment, force)
+        options = {
+          ref: ref,
+          task: task,
+          environment: environment,
+          required_contexts: [],
+          auto_merge: !force,
+          payload: {
+            name: name,
+            provider: "slash-heroku",
+            pipeline: self.to_hash
+          }
+        }
+        github_client.create_deployment(options)
+      end
+
+      def create_github_deployment_status(deployment_url, name, build_id, state)
+        path    = "/apps/#{name}/activity/builds/#{build_id}"
+        payload = {
+          state: state,
+          target_url: "https://dashboard.heroku.com/#{path}",
+          description: "Deploying from escobar-#{Escobar::VERSION}"
+        }
+        github_client.create_deployment_status(deployment_url, payload)
+      end
+
+      def create_heroku_build(app_name, sha)
+        body = {
+          source_blob: {
+            url: github_archive_link(sha),
+            version: sha[0..7],
+            version_description: "#{github_repository}:#{sha}"
+          }
+        }
+        client.heroku.post("/apps/#{app_name}/builds", body)
+      end
+
       # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/LineLength
-      # rubocop:disable Metrics/MethodLength
       def create_deployment(ref, environment, force)
-        deployment             = Escobar::GitHub::Deployment.new(client.github.client)
-        deployment.ref         = ref
-        deployment.repo        = github_repository
-        deployment.force       = force
-        deployment.environment = environment
-
-        archive_link = deployment.archive_link
-
         app = environments[environment] && environments[environment].last
-        if app
-          payload = self.to_hash
-          payload[:name] = name
-          payload[:provider] = "slash-heroku"
+        return({ error: "No #{environment} for #{name}." }) unless app
 
-          github_deployment = deployment.create(payload)
-          body = {
-            source_blob: {
-              url: archive_link,
-              version: github_deployment.sha[0..7],
-              version_description: "#{deployment.repo}:#{github_deployment.sha}"
-            }
-          }
+        github_deployment = create_github_deployment("deploy", ref, environment, force)
+        return({ error: github_deployment["message"] }) unless github_deployment["sha"]
 
-          build = client.heroku.post("/apps/#{app.name}/builds", body)
-          if build["id"]
-            status_payload = {
-              target_url: "#{app.app.dashboard_url}/activity/builds/#{build['id']}",
-              description: "Deploying from slash-heroku"
-            }
+        build = create_heroku_build(app.name, github_deployment["sha"])
+        return({ error: "Unable to create heroku build for #{name}" }) unless build["id"]
 
-            deployment.create_status(github_deployment.url, "pending", status_payload)
-            {
-              app_id: app.name, build_id: build["id"],
-              deployment_url: github_deployment.url
-            }
-          end
-        end
+        create_github_deployment_status(github_deployment["url"], app.name, build["id"], "pending")
+        { app_id: app.name, build_id: build["id"], deployment_url: github_deployment["url"] }
       end
 
       def get(path)

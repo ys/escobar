@@ -5,9 +5,9 @@ module Escobar
       new(Escobar.github_api_token, Escobar.heroku_api_token)
     end
 
-    attr_reader :github, :heroku
+    attr_reader :github_token, :heroku
     def initialize(github_token, heroku_token)
-      @github = Escobar::GitHub::Client.new(github_token)
+      @github_token = github_token
       @heroku = Escobar::Heroku::Client.new(heroku_token)
     end
 
