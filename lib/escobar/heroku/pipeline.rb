@@ -77,11 +77,17 @@ module Escobar
           create_github_deployment_status(github_deployment["url"], nil, "failure", description)
           return({ error: build["message"] })
         when Escobar::Heroku::BuildRequestSuccess
-          path = "/apps/#{app.name}/activity/builds/#{build['id']}"
-          target_url = "https://dashboard.heroku.com#{path}"
+          target_url = "https://dashboard.heroku.com/apps/#{app.name}/activity/builds/#{build['id']}"
 
           create_github_deployment_status(github_deployment["url"], target_url, "pending", "Build running..")
-          { app_id: app.name, build_id: build["id"], deployment_url: github_deployment["url"], name: name, repo: github_repository, sha: sha }
+          {
+            sha: sha,
+            name: name,
+            repo: github_repository,
+            app_id: app.name,
+            build_id: build["id"],
+            deployment_url: github_deployment["url"]
+          }
         else
           return({ error: "Unable to create heroku build for #{name}" })
         end
@@ -103,9 +109,8 @@ module Escobar
         @kolkrabbi ||= Faraday.new(url: "https://#{ENV['KOLKRABBI_HOSTNAME']}")
       end
 
-      def github_client
-        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
-                                                       github_repository)
+      def create_deployment_status(url, payload)
+        github_client.create_deployment_status(url, payload)
       end
 
       private
@@ -136,7 +141,7 @@ module Escobar
           target_url: target_url,
           description: description
         }
-        github_client.create_deployment_status(url, payload)
+        create_deployment_status(url, payload)
       end
 
       def create_heroku_build(app_name, sha)
@@ -148,6 +153,11 @@ module Escobar
           }
         }
         client.heroku.post("/apps/#{app_name}/builds", body)
+      end
+
+      def github_client
+        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
+                                                       github_repository)
       end
     end
   end
