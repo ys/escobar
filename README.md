@@ -1,12 +1,10 @@
 # Escobar [![Build Status](https://travis-ci.org/atmos/escobar.svg?branch=master)](https://travis-ci.org/atmos/escobar)
 
-Escobar is an attempt to combine Heroku Pipelines with GitHub Deployments API.
-
-TODO: Delete this and the text above, and describe your gem
+Escobar combines the Heroku Pipeline with GitHub Deployments APIs.
 
 ## Installation
 
-Use the `escobar` gem on rubygems.org.
+Use the `escobar` gem from rubygems.org.
 
 ## Usage
 
