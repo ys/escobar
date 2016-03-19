@@ -11,6 +11,13 @@ module Escobar
       @heroku = Escobar::Heroku::Client.new(heroku_token)
     end
 
+    # mask password
+    def inspect
+      inspected = super
+      inspected = inspected.gsub! @github_token, "*******" if @github_token
+      inspected
+    end
+
     def [](key)
       pipelines.find { |pipeline| pipeline.name == key }
     end

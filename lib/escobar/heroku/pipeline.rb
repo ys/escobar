@@ -37,12 +37,9 @@ module Escobar
         }
       end
 
-      def repository
-        @repository ||= get("/pipelines/#{id}/repository")
-      end
-
       def github_repository
-        repository["repository"] && repository["repository"]["name"]
+        remote_repository["repository"] &&
+          remote_repository["repository"]["name"]
       end
 
       def couplings
@@ -55,67 +52,33 @@ module Escobar
         end
       end
 
-      def github_archive_link(ref)
-        github_client.archive_link(ref)
-      end
-
-      def github_client
-        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
-                                                       github_repository)
-      end
-
-      def custom_deployment_payload
-        { name: name, pipeline: self.to_hash, provider: "slash-heroku" }
-      end
-
-      def create_github_deployment(task, ref, environment, force = false, extras = {})
-        options = {
-          ref: ref,
-          task: task,
-          environment: environment,
-          required_contexts: [],
-          auto_merge: !force,
-          payload: extras.merge(custom_deployment_payload)
-        }
-        github_client.create_deployment(options)
-      end
-
-      def create_github_deployment_status(deployment_url, name, build_id, state)
-        path    = "/apps/#{name}/activity/builds/#{build_id}"
-        payload = {
-          state: state,
-          target_url: "https://dashboard.heroku.com#{path}",
-          description: "Deploying from escobar-#{Escobar::VERSION}"
-        }
-        github_client.create_deployment_status(deployment_url, payload)
-      end
-
-      def create_heroku_build(app_name, sha)
-        body = {
-          source_blob: {
-            url: github_archive_link(sha),
-            version: sha[0..7],
-            version_description: "#{github_repository}:#{sha}"
-          }
-        }
-        client.heroku.post("/apps/#{app_name}/builds", body)
-      end
-
       # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/LineLength
-      def create_deployment(ref, environment, force)
+      def create_deployment(ref, environment, force = false, custom_payload = {})
         app = environments[environment] && environments[environment].last
         return({ error: "No '#{environment}' environment for #{name}." }) unless app
 
-        github_deployment = create_github_deployment("deploy", ref, environment, force)
+        github_deployment = create_github_deployment("deploy", ref, environment, force, custom_payload)
         return({ error: github_deployment["message"] }) unless github_deployment["sha"]
 
         build = create_heroku_build(app.name, github_deployment["sha"])
-        return({ error: "Unable to create heroku build for #{name}" }) unless build["id"]
+        case build["id"]
+        when "two_factor"
+          description = "A second factor is required. Use your configured authenticator app or yubikey."
+          create_github_deployment_status(github_deployment["url"], nil, "failure", description)
+          return({ error: build["message"] })
+        when Escobar::Heroku::BuildRequestSuccess
+          path = "/apps/#{app.name}/activity/builds/#{build['id']}"
+          target_url = "https://dashboard.heroku.com#{path}"
 
-        create_github_deployment_status(github_deployment["url"], app.name, build["id"], "pending")
-        { app_id: app.name, build_id: build["id"], deployment_url: github_deployment["url"] }
+          create_github_deployment_status(github_deployment["url"], target_url, "pending", "Build running..")
+          { app_id: app.name, build_id: build["id"], deployment_url: github_deployment["url"] }
+        else
+          return({ error: "Unable to create heroku build for #{name}" })
+        end
       end
+      # rubocop:enable Metrics/AbcSize
+      # rubocop:enable Metrics/LineLength
 
       def get(path)
         response = kolkrabbi.get do |request|
@@ -129,6 +92,53 @@ module Escobar
 
       def kolkrabbi
         @kolkrabbi ||= Faraday.new(url: "https://#{ENV['KOLKRABBI_HOSTNAME']}")
+      end
+
+      private
+
+      def remote_repository
+        @remote_repository ||= get("/pipelines/#{id}/repository")
+      end
+
+      def github_client
+        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
+                                                       github_repository)
+      end
+
+      def custom_deployment_payload
+        { name: name, pipeline: self.to_hash, provider: "slash-heroku" }
+      end
+
+      def create_github_deployment(task, ref, environment, force, extras = {})
+        options = {
+          ref: ref,
+          task: task,
+          environment: environment,
+          required_contexts: [],
+          auto_merge: !force,
+          payload: extras.merge(custom_deployment_payload)
+        }
+        github_client.create_deployment(options)
+      end
+
+      def create_github_deployment_status(url, target_url, state, description)
+        payload = {
+          state: state,
+          target_url: target_url,
+          description: description
+        }
+        github_client.create_deployment_status(url, payload)
+      end
+
+      def create_heroku_build(app_name, sha)
+        body = {
+          source_blob: {
+            url: github_client.archive_link(sha),
+            version: sha[0..7],
+            version_description: "#{github_repository}:#{sha}"
+          }
+        }
+        client.heroku.post("/apps/#{app_name}/builds", body)
       end
     end
   end

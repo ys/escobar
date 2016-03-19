@@ -8,6 +8,13 @@ module Escobar
         @name_with_owner = name_with_owner
       end
 
+      # mask password
+      def inspect
+        inspected = super
+        inspected = inspected.gsub! @token, "*******" if @token
+        inspected
+      end
+
       def whoami
         client.get("/user")
       end

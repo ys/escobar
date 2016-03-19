@@ -5,6 +5,8 @@ require "escobar/version"
 
 # Top-level module for Escobar code
 module Escobar
+  UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
+
   def self.netrc
     @netrc ||= begin
                  if env_netrc
@@ -41,6 +43,9 @@ module Escobar
 
   def self.github_api_token
     netrc["api.github.com"]["password"]
+  end
+  module Heroku
+    BuildRequestSuccess = Escobar::UUID_REGEX
   end
 end
 
