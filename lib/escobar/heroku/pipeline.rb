@@ -30,6 +30,7 @@ module Escobar
 
       def to_hash
         {
+          id: id,
           name: name,
           github_repository: github_repository,
           environments: environment_hash
@@ -63,18 +64,18 @@ module Escobar
                                                        github_repository)
       end
 
-      def create_github_deployment(task, ref, environment, force)
+      def custom_deployment_payload
+        { name: name, pipeline: self.to_hash, provider: "slash-heroku" }
+      end
+
+      def create_github_deployment(task, ref, environment, force = false, extras = {})
         options = {
           ref: ref,
           task: task,
           environment: environment,
           required_contexts: [],
           auto_merge: !force,
-          payload: {
-            name: name,
-            provider: "slash-heroku",
-            pipeline: self.to_hash
-          }
+          payload: extras.merge(custom_deployment_payload)
         }
         github_client.create_deployment(options)
       end
