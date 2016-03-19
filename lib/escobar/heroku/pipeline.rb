@@ -83,7 +83,7 @@ module Escobar
         path    = "/apps/#{name}/activity/builds/#{build_id}"
         payload = {
           state: state,
-          target_url: "https://dashboard.heroku.com/#{path}",
+          target_url: "https://dashboard.heroku.com#{path}",
           description: "Deploying from escobar-#{Escobar::VERSION}"
         }
         github_client.create_deployment_status(deployment_url, payload)
