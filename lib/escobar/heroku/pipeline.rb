@@ -82,7 +82,7 @@ module Escobar
       # rubocop:enable Metrics/LineLength
 
       def get(path)
-        response = kolkrabbi.get do |request|
+        response = kolkrabbi_client.get do |request|
           request.url path
           request.headers["Content-Type"]  = "application/json"
           request.headers["Authorization"] = "Bearer #{client.heroku.token}"
@@ -91,19 +91,19 @@ module Escobar
         JSON.parse(response.body)
       end
 
-      def kolkrabbi
+      def kolkrabbi_client
         @kolkrabbi ||= Faraday.new(url: "https://#{ENV['KOLKRABBI_HOSTNAME']}")
+      end
+
+      def github_client
+        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
+                                                       github_repository)
       end
 
       private
 
       def remote_repository
         @remote_repository ||= get("/pipelines/#{id}/repository")
-      end
-
-      def github_client
-        @github_client ||= Escobar::GitHub::Client.new(client.github_token,
-                                                       github_repository)
       end
 
       def custom_deployment_payload
