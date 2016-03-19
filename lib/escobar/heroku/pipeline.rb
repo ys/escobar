@@ -86,6 +86,7 @@ module Escobar
             repo: github_repository,
             app_id: app.name,
             build_id: build["id"],
+            target_url: target_url,
             deployment_url: github_deployment["url"]
           }
         else
