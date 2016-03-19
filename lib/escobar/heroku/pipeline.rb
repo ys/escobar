@@ -81,7 +81,7 @@ module Escobar
           target_url = "https://dashboard.heroku.com#{path}"
 
           create_github_deployment_status(github_deployment["url"], target_url, "pending", "Build running..")
-          { app_id: app.id, build_id: build["id"], deployment_url: github_deployment["url"], name: name, repo: github_repository, sha: sha }
+          { app_id: app.name, build_id: build["id"], deployment_url: github_deployment["url"], name: name, repo: github_repository, sha: sha }
         else
           return({ error: "Unable to create heroku build for #{name}" })
         end
