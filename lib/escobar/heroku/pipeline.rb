@@ -61,7 +61,8 @@ module Escobar
         github_deployment = create_github_deployment("deploy", ref, environment, force, custom_payload)
         return({ error: github_deployment["message"] }) unless github_deployment["sha"]
 
-        build = create_heroku_build(app.name, github_deployment["sha"])
+        sha   = github_deployment["sha"]
+        build = create_heroku_build(app.name, sha)
         case build["id"]
         when "two_factor"
           description = "A second factor is required. Use your configured authenticator app or yubikey."
@@ -72,7 +73,7 @@ module Escobar
           target_url = "https://dashboard.heroku.com#{path}"
 
           create_github_deployment_status(github_deployment["url"], target_url, "pending", "Build running..")
-          { app_id: app.name, build_id: build["id"], deployment_url: github_deployment["url"] }
+          { app_id: app.id, build_id: build["id"], deployment_url: github_deployment["url"], repo: github_repository, sha: sha }
         else
           return({ error: "Unable to create heroku build for #{name}" })
         end
