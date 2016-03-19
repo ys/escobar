@@ -31,13 +31,5 @@ module Escobar
         Escobar::Heroku::Pipeline.new(self, pipe["id"], pipe["name"])
       end
     end
-
-    def reap_deployment(heroku_app_id, heroku_build_id)
-      info = heroku.get("/apps/#{heroku_app_id}/builds/#{heroku_build_id}")
-      case info["status"]
-      when "succeeded", "failed"
-        info
-      end
-    end
   end
 end

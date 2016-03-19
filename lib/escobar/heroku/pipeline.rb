@@ -52,6 +52,14 @@ module Escobar
         end
       end
 
+      def reap_build(app_id, build_id)
+        info = client.heroku.get("/apps/#{app_id}/builds/#{build_id}")
+        case info["status"]
+        when "succeeded", "failed"
+          info
+        end
+      end
+
       # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/LineLength
       def create_deployment(ref, environment, force = false, custom_payload = {})
