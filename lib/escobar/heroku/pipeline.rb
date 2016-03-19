@@ -104,7 +104,7 @@ module Escobar
       # rubocop:disable Metrics/LineLength
       def create_deployment(ref, environment, force)
         app = environments[environment] && environments[environment].last
-        return({ error: "No #{environment} for #{name}." }) unless app
+        return({ error: "No '#{environment}' environment for #{name}." }) unless app
 
         github_deployment = create_github_deployment("deploy", ref, environment, force)
         return({ error: github_deployment["message"] }) unless github_deployment["sha"]
