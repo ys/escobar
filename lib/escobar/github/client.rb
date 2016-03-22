@@ -25,6 +25,25 @@ module Escobar
         response && response.headers && response.headers["Location"]
       end
 
+      def required_contexts
+        path = "/repos/#{name_with_owner}/branches/#{default_branch}"
+        repo = JSON.parse(http_method(:get, path).body)
+        if repo["protection"] && repo["protection"]["enabled"]
+          return repo["protection"]["required_status_checks"]["contexts"]
+        else
+          []
+        end
+      rescue StandardError
+        []
+      end
+
+      def default_branch
+        response = http_method(:get, "/repos/#{name_with_owner}")
+        JSON.parse(response.body)["default_branch"]
+      rescue StandardError
+        "master"
+      end
+
       def create_deployment(options)
         body = {
           ref: options[:ref] || "master",
@@ -54,10 +73,14 @@ module Escobar
         response && response.body
       end
 
+      def accept_headers
+        "application/vnd.github.loki-preview+json"
+      end
+
       def http_method(verb, path)
         client.send(verb) do |request|
           request.url path
-          request.headers["Accept"] = "application/vnd.github+json"
+          request.headers["Accept"] = accept_headers
           request.headers["Content-Type"] = "application/json"
           request.headers["Authorization"] = "token #{token}"
         end
@@ -66,7 +89,7 @@ module Escobar
       def post(path, body)
         response = client.post do |request|
           request.url path
-          request.headers["Accept"] = "application/vnd.github+json"
+          request.headers["Accept"] = accept_headers
           request.headers["Content-Type"] = "application/json"
           request.headers["Authorization"] = "token #{token}"
           request.body = body.to_json

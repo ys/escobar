@@ -134,10 +134,10 @@ module Escobar
         options = {
           ref: ref,
           task: task,
-          environment: environment,
-          required_contexts: [],
           auto_merge: !force,
-          payload: extras.merge(custom_deployment_payload)
+          payload: extras.merge(custom_deployment_payload),
+          environment: environment,
+          required_contexts: github_client.required_contexts
         }
         github_client.create_deployment(options)
       end
