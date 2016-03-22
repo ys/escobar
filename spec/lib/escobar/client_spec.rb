@@ -1,38 +1,6 @@
 require_relative "../../spec_helper"
 
 describe Escobar::Client do
-  def default_heroku_headers
-    {
-      "Accept"          => "application/vnd.heroku+json; version=3",
-      "Accept-Encoding" => "",
-      "Authorization"   => "Bearer #{Escobar.heroku_api_token}",
-      "Content-Type"    => "application/json",
-      "User-Agent"      => "Faraday v0.9.2"
-    }
-  end
-
-  def default_kolkrabbi_headers
-    {
-      "Accept"          => "*/*",
-      "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-      "Authorization"   => "Bearer #{Escobar.heroku_api_token}",
-      "Content-Type"    => "application/json",
-      "User-Agent"      => "Faraday v0.9.2"
-    }
-  end
-
-  def stub_heroku_response(path)
-    stub_request(:get, "https://api.heroku.com#{path}")
-      .with(headers: default_heroku_headers)
-      .to_return(status: 200, body: fixture_data("heroku#{path}"))
-  end
-
-  def stub_kolkrabbi_response(path)
-    stub_request(:get, "https://kolkrabbit.com#{path}")
-      .with(headers: default_kolkrabbi_headers)
-      .to_return(status: 200, body: fixture_data("kolkrabbi#{path}"))
-  end
-
   let(:client) { Escobar::Client.from_environment }
 
   before do

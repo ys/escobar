@@ -37,6 +37,10 @@ module Escobar
         }
       end
 
+      def configured?
+        couplings.any? && github_repository
+      end
+
       def github_repository
         remote_repository["repository"] &&
           remote_repository["repository"]["name"]
@@ -60,17 +64,8 @@ module Escobar
         end
       end
 
-      # rubocop:disable Metrics/AbcSize
       # rubocop:disable Metrics/LineLength
-      def create_deployment(ref, environment, force = false, custom_payload = {})
-        app = environments[environment] && environments[environment].last
-        return({ error: "No '#{environment}' environment for #{name}." }) unless app
-
-        github_deployment = create_github_deployment("deploy", ref, environment, force, custom_payload)
-        return({ error: github_deployment["message"] }) unless github_deployment["sha"]
-
-        sha   = github_deployment["sha"]
-        build = create_heroku_build(app.name, sha)
+      def create_deployment_from(app, github_deployment, sha, build)
         case build["id"]
         when "two_factor"
           description = "A second factor is required. Use your configured authenticator app or yubikey."
@@ -93,7 +88,18 @@ module Escobar
           return({ error: "Unable to create heroku build for #{name}" })
         end
       end
-      # rubocop:enable Metrics/AbcSize
+
+      def create_deployment(ref, environment, force = false, custom_payload = {})
+        app = environments[environment] && environments[environment].last
+        return({ error: "No '#{environment}' environment for #{name}." }) unless app
+
+        github_deployment = create_github_deployment("deploy", ref, environment, force, custom_payload)
+        return({ error: github_deployment["message"] }) unless github_deployment["sha"]
+
+        sha   = github_deployment["sha"]
+        build = create_heroku_build(app.name, sha)
+        create_deployment_from(app, github_deployment, sha, build)
+      end
       # rubocop:enable Metrics/LineLength
 
       def get(path)
