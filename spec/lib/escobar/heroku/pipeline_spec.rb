@@ -78,7 +78,7 @@ describe Escobar::Heroku::Pipeline do
       expect(pipeline).to be_configured
       expect(pipeline.default_environment).to eql("staging")
       expect(pipeline.default_branch).to eql("master")
-      expect(pipeline.required_contexts).to eql(["continuous-integration/travis-ci/push"])
+      expect(pipeline.required_commit_contexts).to eql(["continuous-integration/travis-ci/push"])
     end
     # rubocop:enable Metrics/LineLength
   end
