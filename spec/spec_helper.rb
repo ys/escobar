@@ -63,6 +63,15 @@ RSpec.configure do |config|
     JSON.parse(fixture_data(name))
   end
 
+  def default_github_headers
+    {
+      "Accept"          => "application/vnd.github.loki-preview+json",
+      "Authorization"   => "token #{Escobar.github_api_token}",
+      "Content-Type"    => "application/json",
+      "User-Agent"      => "Faraday v0.9.2"
+    }
+  end
+
   def default_heroku_headers
     {
       "Accept"          => "application/vnd.heroku+json; version=3",

@@ -1,14 +1,6 @@
 require "spec_helper"
 
 describe Escobar::GitHub::Client do
-  def default_github_headers
-    {
-      "Accept"          => "application/vnd.github.loki-preview+json",
-      "Authorization"   => "token #{Escobar.github_api_token}",
-      "Content-Type"    => "application/json",
-      "User-Agent"      => "Faraday v0.9.2"
-    }
-  end
   let(:escobar) { Escobar::Client.from_environment }
   let(:hubot) do
     Escobar::GitHub::Client.new(escobar.github_token, "atmos/hubot")

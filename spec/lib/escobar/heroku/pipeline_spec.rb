@@ -45,5 +45,27 @@ describe Escobar::Heroku::Pipeline do
       expect(couplings.first.stage).to eql("production")
       expect(couplings.last.stage).to eql("staging")
     end
+
+    it "knows the required contexts of a pipeline" do
+      pipeline_path = "/pipelines/#{id}"
+      stub_heroku_response(pipeline_path)
+      stub_heroku_response("#{pipeline_path}/pipeline-couplings")
+      stub_kolkrabbi_response("#{pipeline_path}/repository")
+
+      response = fixture_data("api.github.com/repos/atmos/slash-heroku/index")
+      stub_request(:get, "https://api.github.com/repos/atmos/slash-heroku")
+        .with(headers: default_github_headers)
+        .to_return(status: 200, body: response, headers: {})
+      response = fixture_data("api.github.com/repos/atmos/slash-heroku/branches/master")
+      stub_request(:get, "https://api.github.com/repos/atmos/slash-heroku/branches/master")
+        .with(headers: default_github_headers)
+        .to_return(status: 200, body: response, headers: {})
+
+      pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
+      expect(pipeline.github_repository).to eql("atmos/slash-heroku")
+      expect(pipeline).to be_configured
+      expect(pipeline.default_branch).to eql("master")
+      expect(pipeline.required_contexts).to eql(["continuous-integration/travis-ci/push"])
+    end
   end
 end

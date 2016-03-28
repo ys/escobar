@@ -56,6 +56,14 @@ module Escobar
         end
       end
 
+      def default_branch
+        github_client.default_branch
+      end
+
+      def required_contexts
+        github_client.required_contexts
+      end
+
       def reap_build(app_id, build_id)
         info = client.heroku.get("/apps/#{app_id}/builds/#{build_id}")
         case info["status"]
