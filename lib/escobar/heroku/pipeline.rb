@@ -64,8 +64,14 @@ module Escobar
         github_client.default_branch
       end
 
-      def required_contexts
-        github_client.required_contexts
+      def required_commit_contexts(forced)
+        return [] if forced
+        github_client.required_contexts.map do |context|
+          if context == "continuous-integration/travis-ci"
+            context = "continuous-integration/travis-ci/push"
+          end
+          context
+        end
       end
 
       def heroku_permalink
@@ -152,8 +158,7 @@ module Escobar
       end
 
       def create_github_deployment(task, ref, environment, force, extras = {})
-        required_contexts = github_client.required_contexts
-        required_contexts = [] if force
+        required_contexts = required_commit_contexts(force)
 
         options = {
           ref: ref,
