@@ -46,6 +46,7 @@ describe Escobar::Heroku::Pipeline do
       expect(couplings.last.stage).to eql("staging")
     end
 
+    # rubocop:disable Metrics/LineLength
     it "knows the required contexts of a pipeline" do
       pipeline_path = "/pipelines/#{id}"
       stub_heroku_response(pipeline_path)
@@ -67,5 +68,6 @@ describe Escobar::Heroku::Pipeline do
       expect(pipeline.default_branch).to eql("master")
       expect(pipeline.required_contexts).to eql(["continuous-integration/travis-ci/push"])
     end
+    # rubocop:enable Metrics/LineLength
   end
 end
