@@ -65,6 +65,7 @@ describe Escobar::Heroku::Pipeline do
       pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
       expect(pipeline.github_repository).to eql("atmos/slash-heroku")
       expect(pipeline).to be_configured
+      expect(pipeline.default_environment).to eql("staging")
       expect(pipeline.default_branch).to eql("master")
       expect(pipeline.required_contexts).to eql(["continuous-integration/travis-ci/push"])
     end

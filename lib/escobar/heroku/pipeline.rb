@@ -56,6 +56,10 @@ module Escobar
         end
       end
 
+      def default_environment
+        sorted_environments.last
+      end
+
       def default_branch
         github_client.default_branch
       end
