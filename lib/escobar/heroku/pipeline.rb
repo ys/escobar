@@ -68,8 +68,13 @@ module Escobar
         github_client.required_contexts
       end
 
-      def permalink
+      def heroku_permalink
         "https://dashboard.heroku.com/pipelines/#{id}"
+      end
+
+      def default_branch_settings_uri
+        "https://github.com/#{github_repository}/" \
+          "settings/branches/#{default_branch}"
       end
 
       def reap_build(app_id, build_id)

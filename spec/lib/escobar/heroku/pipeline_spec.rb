@@ -10,23 +10,32 @@ describe Escobar::Heroku::Pipeline do
   end
 
   describe "pipelines" do
+    # rubocop:disable Metrics/LineLength
     it "gets a list of available pipeline deployments" do
       pipeline_path = "/pipelines/#{id}"
       stub_heroku_response(pipeline_path)
       stub_heroku_response("#{pipeline_path}/pipeline-couplings")
       stub_kolkrabbi_response("#{pipeline_path}/repository")
 
+      response = fixture_data("api.github.com/repos/atmos/slash-heroku/index")
+      stub_request(:get, "https://api.github.com/repos/atmos/slash-heroku")
+        .with(headers: default_github_headers)
+        .to_return(status: 200, body: response, headers: {})
+
       pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
       expect(pipeline.github_repository).to eql("atmos/slash-heroku")
       expect(pipeline).to be_configured
-      expect(pipeline.permalink)
-        .to eql("https://dashboard.heroku.com/pipelines/#{pipeline.id}")
+      expect(pipeline.heroku_permalink)
+        .to eql("https://dashboard.heroku.com/pipelines/#{id}")
+      expect(pipeline.default_branch_settings_uri)
+        .to eql("https://github.com/atmos/slash-heroku/settings/branches/master")
 
       couplings = pipeline.couplings
       expect(couplings.size).to eql(2)
       expect(couplings.first.stage).to eql("production")
       expect(couplings.last.stage).to eql("staging")
     end
+    # rubocop:enable Metrics/LineLength
 
     it "knows a respository is misconfigured if no github repo connected" do
       pipeline_path = "/pipelines/#{id}"
