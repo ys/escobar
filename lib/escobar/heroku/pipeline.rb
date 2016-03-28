@@ -152,13 +152,16 @@ module Escobar
       end
 
       def create_github_deployment(task, ref, environment, force, extras = {})
+        required_contexts = github_client.required_contexts
+        required_contexts = [] if force
+
         options = {
           ref: ref,
           task: task,
           auto_merge: !force,
           payload: extras.merge(custom_deployment_payload),
           environment: environment,
-          required_contexts: github_client.required_contexts
+          required_contexts: required_contexts
         }
         github_client.create_deployment(options)
       end
