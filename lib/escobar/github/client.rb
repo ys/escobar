@@ -49,7 +49,7 @@ module Escobar
           ref: options[:ref] || "master",
           task: "deploy",
           auto_merge: false,
-          required_contexts: [],
+          required_contexts: options[:required_contexts] || [],
           payload: options[:payload] || {},
           environment: options[:environment] || "staging",
           description: "Shipped from chat with slash-heroku"
