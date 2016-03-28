@@ -68,6 +68,10 @@ module Escobar
         github_client.required_contexts
       end
 
+      def permalink
+        "https://dashboard.heroku.com/pipelines/#{id}"
+      end
+
       def reap_build(app_id, build_id)
         info = client.heroku.get("/apps/#{app_id}/builds/#{build_id}")
         case info["status"]

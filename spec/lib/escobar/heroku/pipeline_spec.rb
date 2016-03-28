@@ -19,6 +19,8 @@ describe Escobar::Heroku::Pipeline do
       pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
       expect(pipeline.github_repository).to eql("atmos/slash-heroku")
       expect(pipeline).to be_configured
+      expect(pipeline.permalink)
+        .to eql("https://dashboard.heroku.com/pipelines/#{pipeline.id}")
 
       couplings = pipeline.couplings
       expect(couplings.size).to eql(2)
