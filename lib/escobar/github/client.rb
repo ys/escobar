@@ -39,9 +39,11 @@ module Escobar
 
       def default_branch
         response = http_method(:get, "/repos/#{name_with_owner}")
-        JSON.parse(response.body)["default_branch"]
-      rescue StandardError
-        "master"
+        if response.status == 200
+          JSON.parse(response.body)["default_branch"]
+        else
+          "master"
+        end
       end
 
       def create_deployment(options)

@@ -44,6 +44,17 @@ describe Escobar::GitHub::Client do
 
       expect(slash_heroku.default_branch).to eql("master")
     end
+
+    it "returns 'master' if the repo can't be found with the token" do
+      response = { message: "Not Found",
+                   documentation_url: "https://developer.github.com/v3" }.to_json
+
+      stub_request(:get, "https://api.github.com/repos/atmos/slash-heroku")
+        .with(headers: default_github_headers)
+        .to_return(status: 404, body: response, headers: {})
+
+      expect(slash_heroku.default_branch).to eql("master")
+    end
   end
 
   describe "#required_contexts" do
