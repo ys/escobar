@@ -45,7 +45,7 @@ describe Escobar::GitHub::Client do
       expect(slash_heroku.default_branch).to eql("master")
     end
 
-    it "returns 'master' if the repo can't be found with the token" do
+    it "raises a RepoNotFound error if the repo can't be found with the token" do
       response = { message: "Not Found",
                    documentation_url: "https://developer.github.com/v3" }.to_json
 
@@ -53,7 +53,9 @@ describe Escobar::GitHub::Client do
         .with(headers: default_github_headers)
         .to_return(status: 404, body: response, headers: {})
 
-      expect(slash_heroku.default_branch).to eql("master")
+      expect do
+        slash_heroku.default_branch
+      end.to raise_error(Escobar::GitHub::RepoNotFound)
     end
   end
 
@@ -83,6 +85,19 @@ describe Escobar::GitHub::Client do
         .to_return(status: 200, body: response, headers: {})
 
       expect(slash_heroku.required_contexts).to eql(["continuous-integration/travis-ci/push"])
+    end
+
+    it "raises a RepoNotFound error if the repo can't be found with the token" do
+      response = { message: "Not Found",
+                   documentation_url: "https://developer.github.com/v3" }.to_json
+
+      stub_request(:get, "https://api.github.com/repos/atmos/slash-heroku")
+        .with(headers: default_github_headers)
+        .to_return(status: 404, body: response, headers: {})
+
+      expect do
+        slash_heroku.required_contexts
+      end.to raise_error(Escobar::GitHub::RepoNotFound)
     end
   end
 

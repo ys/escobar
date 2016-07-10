@@ -1,5 +1,6 @@
 module Escobar
   module GitHub
+    class RepoNotFound < StandardError; end
     # Top-level class for interacting with GitHub API
     class Client
       attr_reader :name_with_owner, :token
@@ -27,14 +28,17 @@ module Escobar
 
       def required_contexts
         path = "/repos/#{name_with_owner}/branches/#{default_branch}"
-        repo = JSON.parse(http_method(:get, path).body)
-        if repo["protection"] && repo["protection"]["enabled"]
-          return repo["protection"]["required_status_checks"]["contexts"]
+        response = http_method(:get, path)
+        if response.status == 200
+          repo = JSON.parse(response.body)
+          if repo["protection"] && repo["protection"]["enabled"]
+            return repo["protection"]["required_status_checks"]["contexts"]
+          else
+            []
+          end
         else
-          []
+          raise RepoNotFound, "Unable to access #{name_with_owner}"
         end
-      rescue StandardError
-        []
       end
 
       def default_branch
@@ -42,7 +46,7 @@ module Escobar
         if response.status == 200
           JSON.parse(response.body)["default_branch"]
         else
-          "master"
+          raise RepoNotFound, "Unable to access #{name_with_owner}"
         end
       end
 
