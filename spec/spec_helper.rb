@@ -15,7 +15,7 @@ RSpec.configure do |config|
   config.include(WebMock::API)
 
   config.before(:all) do
-    File.open("#{ENV['NETRC']}/.netrc", File::RDWR | File::CREAT, 0600) do |fp|
+    File.open("#{ENV['NETRC']}/.netrc", File::RDWR | File::CREAT, 0o600) do |fp|
       netrc_file_contents.each do |uri, entry|
         fp.write "machine #{uri}\n  login #{entry['login']}\n" \
                    "  password #{entry['password']}\n"
