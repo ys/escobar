@@ -74,6 +74,9 @@ MethodLength:
   Max: 25
   Severity: error
 
+FrozenStringLiteralComment:
+  Enabled: false # Adding comment to all files...
+
 Alias:
   Enabled: false # We have no guidance on alias vs alias_method
 
@@ -87,6 +90,7 @@ Metrics/AbcSize:
   Max: 16
 
 AllCops:
+  TargetRubyVersion: 2.3
   # Include gemspec and Rakefile
   Include:
     - '**/*.gemspec'
@@ -103,7 +107,9 @@ AllCops:
     - 'script/**/*'
     - 'config/**/*'
     - 'vendor/**/*'
-  # By default, the rails cops are not run. Override in project or home
-  # directory .rubocop.yml files, or by giving the -R/--rails option.
+# By default, the rails cops are not run. Override in project or home
+# directory .rubocop.yml files, or by giving the -R/--rails option.
 Rails:
-  Enabled: false
+  Enabled: true
+Rails/Delegate:
+  Enabled: false # delegate isn't available outside of rails?

@@ -97,7 +97,7 @@ module Escobar
         when "two_factor"
           description = "A second factor is required. Use your configured authenticator app or yubikey."
           create_github_deployment_status(github_deployment["url"], nil, "failure", description)
-          return({ error: build["message"] })
+          { error: build["message"] }
         when Escobar::Heroku::BuildRequestSuccess
           target_url = "https://dashboard.heroku.com/apps/#{app.name}/activity/builds/#{build['id']}"
 
@@ -112,7 +112,7 @@ module Escobar
             deployment_url: github_deployment["url"]
           }
         else
-          return({ error: "Unable to create heroku build for #{name}" })
+          { error: "Unable to create heroku build for #{name}" }
         end
       end
 
