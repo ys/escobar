@@ -26,28 +26,25 @@ module Escobar
         response && response.headers && response.headers["Location"]
       end
 
+      def not_found
+        raise RepoNotFound, "Unable to access #{name_with_owner}"
+      end
+
       def required_contexts
         path = "/repos/#{name_with_owner}/branches/#{default_branch}"
         response = http_method(:get, path)
-        if response.status == 200
-          repo = JSON.parse(response.body)
-          if repo["protection"] && repo["protection"]["enabled"]
-            return repo["protection"]["required_status_checks"]["contexts"]
-          else
-            []
-          end
-        else
-          raise RepoNotFound, "Unable to access #{name_with_owner}"
-        end
+
+        not_found unless response.status == 200
+
+        repo = JSON.parse(response.body)
+        return [] unless repo["protection"] && repo["protection"]["enabled"]
+        repo["protection"]["required_status_checks"]["contexts"]
       end
 
       def default_branch
         response = http_method(:get, "/repos/#{name_with_owner}")
-        if response.status == 200
-          JSON.parse(response.body)["default_branch"]
-        else
-          raise RepoNotFound, "Unable to access #{name_with_owner}"
-        end
+        not_found unless response.status == 200
+        JSON.parse(response.body)["default_branch"]
       end
 
       def create_deployment(options)
