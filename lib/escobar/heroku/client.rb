@@ -61,6 +61,23 @@ module Escobar
         response && response.body
       end
 
+      def put(path, second_factor = nil)
+        response = client.put do |request|
+          request.url path
+          request.headers["Accept"] = heroku_accept_header(3)
+          request.headers["Accept-Encoding"] = ""
+          request.headers["Content-Type"]    = "application/json"
+          request.headers["Authorization"]   = "Bearer #{token}"
+          if second_factor
+            request.headers["Heroku-Two-Factor-Code"] = second_factor
+          end
+        end
+
+        JSON.parse(response.body)
+      rescue StandardError
+        response && response.body
+      end
+
       private
 
       def heroku_accept_header(version)
