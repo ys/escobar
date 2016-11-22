@@ -4,6 +4,7 @@ describe Escobar::Heroku::App do
   let(:id) { "4c18c922-6eee-451c-b7c6-c76278652ccc" }
   let(:name) { "slash-heroku" }
   let(:client) { Escobar::Client.from_environment }
+  let(:pipeline) { Escobar::Heroku::Pipeline.new(client, id, name) }
 
   before do
     stub_heroku_response("/pipelines")
@@ -16,7 +17,6 @@ describe Escobar::Heroku::App do
   end
 
   it "handle preauthorization success" do
-    pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
     expect(pipeline.github_repository).to eql("atmos/slash-heroku")
     expect(pipeline).to be_configured
 
@@ -31,11 +31,10 @@ describe Escobar::Heroku::App do
       .to_return(
         status: 200, body: fixture_data("api.heroku.com#{path}")
       )
-    expect(app.preauth!("867530")).to eql(true)
+    expect(app.preauth("867530")).to eql(true)
   end
 
   it "handle preauthorization failure" do
-    pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
     expect(pipeline.github_repository).to eql("atmos/slash-heroku")
     expect(pipeline).to be_configured
 
@@ -50,6 +49,6 @@ describe Escobar::Heroku::App do
       .to_return(
         status: 200, body: fixture_data("api.heroku.com#{path}-failed")
       )
-    expect(app.preauth!("867530")).to eql(false)
+    expect(app.preauth("867530")).to eql(false)
   end
 end
