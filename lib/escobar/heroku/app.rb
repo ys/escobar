@@ -19,6 +19,11 @@ module Escobar
       def dashboard_url
         "https://dashboard.heroku.com/apps/#{name}"
       end
+
+      # Accepts either google authenticator or yubikey second_factor formatting
+      def preauth(second_factor)
+        !client.heroku.put("/apps/#{id}/pre-authorizations", second_factor).any?
+      end
     end
   end
 end
