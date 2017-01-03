@@ -11,4 +11,3 @@
 tmp/.netrc
 .irb.history
 .env
-.ruby-version
