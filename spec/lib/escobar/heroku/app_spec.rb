@@ -5,6 +5,7 @@ describe Escobar::Heroku::App do
   let(:name) { "slash-heroku" }
   let(:client) { Escobar::Client.from_environment }
   let(:pipeline) { Escobar::Heroku::Pipeline.new(client, id, name) }
+  let(:app) { pipeline.environments["production"].first.app }
 
   before do
     stub_heroku_response("/pipelines")
@@ -17,12 +18,6 @@ describe Escobar::Heroku::App do
   end
 
   it "handle preauthorization success" do
-    expect(pipeline.github_repository).to eql("atmos/slash-heroku")
-    expect(pipeline).to be_configured
-
-    production = pipeline.environments["production"]
-    app = production.first.app
-
     expect(app.name).to eql("slash-heroku-production")
 
     path = "/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/pre-authorizations"
@@ -35,12 +30,6 @@ describe Escobar::Heroku::App do
   end
 
   it "handle preauthorization failure" do
-    expect(pipeline.github_repository).to eql("atmos/slash-heroku")
-    expect(pipeline).to be_configured
-
-    production = pipeline.environments["production"]
-    app = production.first.app
-
     expect(app.name).to eql("slash-heroku-production")
 
     path = "/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/pre-authorizations"
@@ -50,5 +39,25 @@ describe Escobar::Heroku::App do
         status: 200, body: fixture_data("api.heroku.com#{path}-failed")
       )
     expect(app.preauth("867530")).to eql(false)
+  end
+
+  it "handles locked applications" do
+    expect(app.name).to eql("slash-heroku-production")
+
+    path = "/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/config-vars"
+    stub_request(:get, "https://api.heroku.com#{path}")
+      .with(headers: default_heroku_headers)
+      .to_return(status: 403, body: { id: "two_factor" }.to_json)
+    expect(app).to be_locked
+  end
+
+  it "handles unlocked applications" do
+    expect(app.name).to eql("slash-heroku-production")
+
+    path = "/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/config-vars"
+    stub_request(:get, "https://api.heroku.com#{path}")
+      .with(headers: default_heroku_headers)
+      .to_return(status: 200, body: { "RACK_ENV": "production" }.to_json)
+    expect(app).to_not be_locked
   end
 end
