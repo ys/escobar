@@ -24,6 +24,11 @@ module Escobar
       def preauth(second_factor)
         !client.heroku.put("/apps/#{id}/pre-authorizations", second_factor).any?
       end
+
+      def locked?
+        response = client.heroku.get("/apps/#{id}/config-vars")
+        response["id"] == "two_factor"
+      end
     end
   end
 end
