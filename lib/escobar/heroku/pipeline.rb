@@ -92,7 +92,7 @@ module Escobar
       end
 
       def create_deployment(ref, environment, force = false, payload = {})
-        app = environments[environment] && environments[environment].last.app.name
+        app = environments[environment] && environments[environment].last.app
         if app
           if !app.locked?
             app.create_build(ref, environment, force, payload)
