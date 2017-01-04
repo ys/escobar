@@ -1,0 +1,30 @@
+{
+  "app": {
+    "id": "01234567-89ab-cdef-0123-456789abcdef"
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-ruby"
+    }
+  ],
+  "created_at": "2012-01-01T12:00:00Z",
+  "id": "01234567-89ab-cdef-0123-456789abcdef",
+  "output_stream_url": "https://build-output.heroku.com/streams/01234567-89ab-cdef-0123-456789abcdef",
+  "source_blob": {
+    "checksum": "SHA256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "url": "https://example.com/source.tgz?token=xyz",
+    "version": "v1.3.0"
+  },
+  "release": {
+    "id": "01234567-89ab-cdef-0123-456789abcdef"
+  },
+  "slug": {
+    "id": "01234567-89ab-cdef-0123-456789abcdef"
+  },
+  "status": "succeeded",
+  "updated_at": "2012-01-01T12:00:00Z",
+  "user": {
+    "id": "01234567-89ab-cdef-0123-456789abcdef",
+    "email": "username@example.com"
+  }
+}

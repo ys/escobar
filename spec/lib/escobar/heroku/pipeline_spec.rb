@@ -109,13 +109,25 @@ describe Escobar::Heroku::Pipeline do
         .with(headers: default_github_headers)
         .to_return(status: 200, body: nil, headers: tarball_headers)
 
+      response = fixture_data("api.heroku.com/apps/slash-heroku-production/builds")
       stub_request(:post, "https://api.heroku.com/apps/slash-heroku-production/builds")
         .with(body: "{\"source_blob\":{\"url\":\"https://codeload.github.com/atmos/slash-heroku/legacy.tar.gz/8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\",\"version\":\"81157927\",\"version_description\":\"atmos/slash-heroku:8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\"}}")
-        .to_return(status: 200, body: nil, headers: {})
+        .to_return(status: 200, body: response, headers: {})
+
+      response = fixture_data("api.github.com/repos/atmos/slash-heroku/deployments/22062424/statuses/pending-1")
+      stub_request(:post, "https://api.github.com/repos/atmos/slash-heroku/deployments/22062424/statuses")
+        .with(headers: default_github_headers)
+        .to_return(status: 200, body: response, headers: {})
 
       pipeline   = Escobar::Heroku::Pipeline.new(client, id, name)
       deployment = pipeline.create_deployment("master", "production")
-      expect(deployment[:error]).to eql("Unable to create heroku build for slash-heroku")
+      expect(deployment[:app_id]).to eql("slash-heroku-production")
+      expect(deployment[:build_id]).to eql("01234567-89ab-cdef-0123-456789abcdef")
+      expect(deployment[:sha]).to eql("8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b")
+      expect(deployment[:name]).to eql("slash-heroku")
+      expect(deployment[:repo]).to eql("atmos/slash-heroku")
+      expect(deployment[:target_url]).to eql("https://dashboard.heroku.com/apps/slash-heroku-production/activity/builds/01234567-89ab-cdef-0123-456789abcdef")
+      expect(deployment[:deployment_url]).to eql("https://api.github.com/repos/atmos/slash-heroku/deployments/22062424")
     end
     # rubocop:enable Metrics/LineLength
   end
