@@ -2,9 +2,9 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "base64"
 require "escobar"
 require "fileutils"
-require "pry"
 require "uuid"
 require "webmock/rspec"
+require "byebug"
 
 tmp_directory = File.expand_path("../../tmp", __FILE__)
 FileUtils.mkdir_p tmp_directory
