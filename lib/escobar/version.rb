@@ -1,3 +1,3 @@
 module Escobar
-  VERSION = "0.2.2.pre6".freeze
+  VERSION = "0.3.0".freeze
 end
