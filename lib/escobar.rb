@@ -44,9 +44,6 @@ module Escobar
   def self.github_api_token
     netrc["api.github.com"]["password"]
   end
-  module Heroku
-    BuildRequestSuccess = Escobar::UUID_REGEX
-  end
 end
 
 require_relative "./escobar/client"
