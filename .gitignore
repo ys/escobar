@@ -11,3 +11,5 @@
 tmp/.netrc
 .irb.history
 .env
+.ruby-version
+.byebug_history

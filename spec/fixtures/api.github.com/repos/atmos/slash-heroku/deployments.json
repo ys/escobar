@@ -1,0 +1,35 @@
+{
+  "url": "https://api.github.com/repos/atmos/slash-heroku/deployments/22062424",
+  "id": 22062424,
+  "sha": "8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b",
+  "ref": "8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b",
+  "task": "deploy",
+  "payload": {
+
+  },
+  "environment": "slash-heroku",
+  "description": null,
+  "creator": {
+    "login": "atmos",
+    "id": 38,
+    "avatar_url": "https://avatars.githubusercontent.com/u/38?v=3",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/atmos",
+    "html_url": "https://github.com/atmos",
+    "followers_url": "https://api.github.com/users/atmos/followers",
+    "following_url": "https://api.github.com/users/atmos/following{/other_user}",
+    "gists_url": "https://api.github.com/users/atmos/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/atmos/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/atmos/subscriptions",
+    "organizations_url": "https://api.github.com/users/atmos/orgs",
+    "repos_url": "https://api.github.com/users/atmos/repos",
+    "events_url": "https://api.github.com/users/atmos/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/atmos/received_events",
+    "type": "User",
+    "site_admin": false
+  },
+  "created_at": "2017-01-03T05:38:37Z",
+  "updated_at": "2017-01-03T05:38:37Z",
+  "statuses_url": "https://api.github.com/repos/atmos/slash-heroku/deployments/22062424/statuses",
+  "repository_url": "https://api.github.com/repos/atmos/slash-heroku"
+}
