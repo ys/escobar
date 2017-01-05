@@ -182,13 +182,14 @@ describe Escobar::Heroku::Pipeline do
         .with(headers: default_github_headers)
         .to_return(status: 200, body: response, headers: {})
 
-      pipeline   = Escobar::Heroku::Pipeline.new(client, id, name)
-      deployment = pipeline.create_deployment("master", "production")
-      expect(deployment[:error]).to eql(
-        "A second authentication factor or pre-authorization is required for " \
-        "this request. Your account has either two-factor or a YubiKey " \
-        "registered."
-      )
+      pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
+      expect { pipeline.create_deployment("master", "production") }
+        .to raise_error(
+          ArgumentError,
+          "A second authentication factor or pre-authorization is required " \
+          "for this request. Your account has either two-factor or a YubiKey " \
+          "registered."
+        )
     end
     # rubocop:enable Metrics/LineLength
   end

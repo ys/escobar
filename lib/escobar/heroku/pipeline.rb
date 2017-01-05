@@ -97,7 +97,7 @@ module Escobar
         when "two_factor"
           description = "A second factor is required. Use your configured authenticator app or yubikey."
           create_github_deployment_status(github_deployment["url"], nil, "failure", description)
-          { error: build["message"] }
+          raise ArgumentError, build["message"]
         when Escobar::Heroku::BuildRequestSuccess
           heroku_build = Escobar::Heroku::Build.new(
             client, app.id, build["id"]
