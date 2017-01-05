@@ -121,13 +121,15 @@ describe Escobar::Heroku::Pipeline do
 
       pipeline   = Escobar::Heroku::Pipeline.new(client, id, name)
       deployment = pipeline.create_deployment("master", "production")
-      expect(deployment[:app_id]).to eql("slash-heroku-production")
-      expect(deployment[:build_id]).to eql("01234567-89ab-cdef-0123-456789abcdef")
-      expect(deployment[:sha]).to eql("8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b")
-      expect(deployment[:name]).to eql("slash-heroku")
-      expect(deployment[:repo]).to eql("atmos/slash-heroku")
-      expect(deployment[:target_url]).to eql("https://dashboard.heroku.com/apps/slash-heroku-production/activity/builds/01234567-89ab-cdef-0123-456789abcdef")
-      expect(deployment[:deployment_url]).to eql("https://api.github.com/repos/atmos/slash-heroku/deployments/22062424")
+      expect(deployment.id).to eql("01234567-89ab-cdef-0123-456789abcdef")
+      expect(deployment.app_id).to eql("e539d5b3-2ede-4e51-80e3-3b5b47678bf4")
+      expect(deployment.github_url).to eql("https://api.github.com/repos/atmos/slash-heroku/deployments/22062424")
+      expect(deployment.dashboard_build_output_url).to eql(
+        "https://dashboard.heroku.com/apps/e539d5b3-2ede-4e51-80e3-3b5b47678bf4/activity/builds/01234567-89ab-cdef-0123-456789abcdef"
+      )
+      expect(deployment.sha).to eql("8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b")
+      expect(deployment.repository).to eql("atmos/slash-heroku")
+      expect(deployment.pipeline_name).to eql("slash-heroku")
     end
     # rubocop:enable Metrics/LineLength
   end

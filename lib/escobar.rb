@@ -52,6 +52,7 @@ end
 require_relative "./escobar/client"
 require_relative "./escobar/github/client"
 require_relative "./escobar/heroku/app"
+require_relative "./escobar/heroku/build"
 require_relative "./escobar/heroku/client"
 require_relative "./escobar/heroku/coupling"
 require_relative "./escobar/heroku/pipeline"

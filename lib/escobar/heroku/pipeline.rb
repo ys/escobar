@@ -99,18 +99,21 @@ module Escobar
           create_github_deployment_status(github_deployment["url"], nil, "failure", description)
           { error: build["message"] }
         when Escobar::Heroku::BuildRequestSuccess
-          target_url = "https://dashboard.heroku.com/apps/#{app.name}/activity/builds/#{build['id']}"
+          heroku_build = Escobar::Heroku::Build.new(
+            client, app.id, build["id"]
+          )
+          heroku_build.github_url = github_deployment["url"]
+          heroku_build.pipeline_name = name
+          heroku_build.sha = sha
 
-          create_github_deployment_status(github_deployment["url"], target_url, "pending", "Build running..")
-          {
-            sha: sha,
-            name: name,
-            repo: github_repository,
-            app_id: app.name,
-            build_id: build["id"],
-            target_url: target_url,
-            deployment_url: github_deployment["url"]
-          }
+          create_github_deployment_status(
+            github_deployment["url"],
+            heroku_build.dashboard_build_output_url,
+            "pending",
+            "Build running.."
+          )
+
+          heroku_build
         else
           { error: "Unable to create heroku build for #{name}" }
         end
