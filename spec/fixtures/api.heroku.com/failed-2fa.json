@@ -1,0 +1,5 @@
+{
+  "id":"two_factor",
+  "message":"A second authentication factor or pre-authorization is required for this request. Your account has either two-factor or a YubiKey registered.",
+  "url":"https://devcenter.heroku.com/articles/two-factor-authentication"
+}
