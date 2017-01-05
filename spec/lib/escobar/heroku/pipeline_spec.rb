@@ -135,6 +135,7 @@ describe Escobar::Heroku::Pipeline do
         name: "slash-heroku",
         repo: "atmos/slash-heroku",
         app_id: "e539d5b3-2ede-4e51-80e3-3b5b47678bf4",
+        app_name: "slash-heroku-production",
         build_id: "01234567-89ab-cdef-0123-456789abcdef",
         command_id: nil,
         target_url: deployment.dashboard_build_output_url,

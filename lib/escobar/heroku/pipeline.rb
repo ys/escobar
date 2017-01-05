@@ -92,6 +92,7 @@ module Escobar
       end
 
       # rubocop:disable Metrics/LineLength
+      # rubocop:disable Metrics/AbcSize
       def create_deployment_from(app, github_deployment, sha, build)
         case build["id"]
         when "two_factor"
@@ -102,6 +103,7 @@ module Escobar
           heroku_build = Escobar::Heroku::Build.new(
             client, app.id, build["id"]
           )
+          heroku_build.app_name = app.name
           heroku_build.github_url = github_deployment["url"]
           heroku_build.pipeline_name = name
           heroku_build.sha = sha
@@ -115,9 +117,10 @@ module Escobar
 
           heroku_build
         else
-          { error: "Unable to create heroku build for #{name}" }
+          raise ArgumentError, "Unable to create heroku build for #{name}"
         end
       end
+      # rubocop:enable Metrics/AbcSize
 
       def create_deployment(ref, environment, force = false, custom_payload = {})
         app = environments[environment] && environments[environment].last

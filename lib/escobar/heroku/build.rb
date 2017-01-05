@@ -4,6 +4,7 @@ module Escobar
     class Build
       attr_reader :app_id, :client, :id
 
+      attr_accessor :app_name
       attr_accessor :command_id
       attr_accessor :github_url
       attr_accessor :pipeline_name
@@ -37,6 +38,7 @@ module Escobar
           name: pipeline_name,
           repo: repository,
           app_id: app_id,
+          app_name: app_name,
           build_id: id,
           command_id: command_id,
           target_url: dashboard_build_output_url,
