@@ -125,7 +125,7 @@ describe Escobar::Heroku::Pipeline do
       expect(deployment.app_id).to eql("e539d5b3-2ede-4e51-80e3-3b5b47678bf4")
       expect(deployment.github_url).to eql("https://api.github.com/repos/atmos/slash-heroku/deployments/22062424")
       expect(deployment.dashboard_build_output_url).to eql(
-        "https://dashboard.heroku.com/apps/e539d5b3-2ede-4e51-80e3-3b5b47678bf4/activity/builds/01234567-89ab-cdef-0123-456789abcdef"
+        "https://dashboard.heroku.com/apps/slash-heroku-production/activity/builds/01234567-89ab-cdef-0123-456789abcdef"
       )
       expect(deployment.sha).to eql("8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b")
       expect(deployment.repository).to eql("atmos/slash-heroku")

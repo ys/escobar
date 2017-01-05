@@ -2,17 +2,17 @@ module Escobar
   module Heroku
     # Class representing a heroku build
     class Build
-      attr_reader :app_id, :client, :id
+      attr_reader :app_id, :app_name, :client, :id
 
-      attr_accessor :app_name
       attr_accessor :command_id
       attr_accessor :github_url
       attr_accessor :pipeline_name
       attr_accessor :sha
 
-      def initialize(client, app_id, id)
+      def initialize(client, app, id)
         @id            = id
-        @app_id        = app_id
+        @app_id        = app.id
+        @app_name      = app.name
         @client        = client
       end
 
@@ -21,7 +21,7 @@ module Escobar
       end
 
       def dashboard_build_output_url
-        "https://dashboard.heroku.com/apps/#{app_id}/activity/builds/#{id}"
+        "https://dashboard.heroku.com/apps/#{app_name}/activity/builds/#{id}"
       end
 
       def repository_regex
