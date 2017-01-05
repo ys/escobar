@@ -130,6 +130,16 @@ describe Escobar::Heroku::Pipeline do
       expect(deployment.sha).to eql("8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b")
       expect(deployment.repository).to eql("atmos/slash-heroku")
       expect(deployment.pipeline_name).to eql("slash-heroku")
+      expect(deployment.to_job_json).to eql(
+        sha: "8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b",
+        name: "slash-heroku",
+        repo: "atmos/slash-heroku",
+        app_id: "e539d5b3-2ede-4e51-80e3-3b5b47678bf4",
+        build_id: "01234567-89ab-cdef-0123-456789abcdef",
+        command_id: nil,
+        target_url: deployment.dashboard_build_output_url,
+        deployment_url: deployment.github_url
+      )
     end
 
     it "create_deployment errors on two factor requirements for apps" do

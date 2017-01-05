@@ -4,6 +4,7 @@ module Escobar
     class Build
       attr_reader :app_id, :client, :id
 
+      attr_accessor :command_id
       attr_accessor :github_url
       attr_accessor :pipeline_name
       attr_accessor :sha
@@ -28,6 +29,19 @@ module Escobar
 
       def repository
         github_url.match(repository_regex)[1]
+      end
+
+      def to_job_json
+        {
+          sha: sha,
+          name: pipeline_name,
+          repo: repository,
+          app_id: app_id,
+          build_id: id,
+          command_id: command_id,
+          target_url: dashboard_build_output_url,
+          deployment_url: github_url
+        }
       end
     end
   end
