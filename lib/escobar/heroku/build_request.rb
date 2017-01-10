@@ -11,6 +11,10 @@ module Escobar
           error.build_request = build_request
           error
         end
+
+        def dashboard_url
+          "https://dashboard.heroku.com/apps/#{build_request.app.name}"
+        end
       end
 
       attr_reader :app, :github_deployment_url, :pipeline, :sha
