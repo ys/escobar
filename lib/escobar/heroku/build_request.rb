@@ -2,20 +2,29 @@ module Escobar
   module Heroku
     # Class representing a heroku build request
     class BuildRequest
-      attr_reader :app, :custom_payload, :environment, :forced, \
-                  :github_deployment_url, :pipeline, :ref, :sha
+      attr_reader :app, :github_deployment_url, :pipeline, :sha
 
-      def initialize(pipeline, app, ref, forced, custom_payload)
-        @app            = app
-        @ref            = ref
-        @forced         = forced
-        @pipeline       = pipeline
-        @custom_payload = custom_payload
+      attr_accessor :environment, :ref, :forced, :custom_payload
+
+      def initialize(pipeline, app)
+        @app      = app
+        @pipeline = pipeline
       end
 
-      def create(task = "deploy", environment = "production")
-        @environment = environment
+      def create(task, environment, ref, forced, custom_payload)
+        if app.locked?
+          raise ArgumentError, "Application requires second factor: #{app.name}"
+        end
 
+        @environment = environment
+        @ref = ref
+        @forced = forced
+        @custom_payload = custom_payload
+
+        create_in_api(task)
+      end
+
+      def create_in_api(task)
         create_github_deployment(task)
 
         unless sha

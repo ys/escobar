@@ -30,9 +30,8 @@ module Escobar
         response["id"] == "two_factor"
       end
 
-      def build_request_for(pipeline, ref, forced, custom_payload)
-        Escobar::Heroku::BuildRequest.new(pipeline, self, ref,
-                                          forced, custom_payload)
+      def build_request_for(pipeline)
+        Escobar::Heroku::BuildRequest.new(pipeline, self)
       end
     end
   end

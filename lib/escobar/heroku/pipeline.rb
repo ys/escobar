@@ -99,13 +99,11 @@ module Escobar
         end
 
         heroku_app = app.app
-        if heroku_app.locked?
-          raise ArgumentError, "Application requires second factor: #{heroku_app.name}"
-        end
 
-        build_request = heroku_app.build_request_for(self, ref, force, custom_payload)
-
-        heroku_build = build_request.create("deploy", environment)
+        build_request = heroku_app.build_request_for(self)
+        heroku_build = build_request.create(
+          "deploy", environment, ref, force, custom_payload
+        )
 
         heroku_build
       end
