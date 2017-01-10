@@ -29,6 +29,11 @@ module Escobar
         response = client.heroku.get("/apps/#{id}/config-vars")
         response["id"] == "two_factor"
       end
+
+      def build_request_for(pipeline, ref, forced, custom_payload)
+        Escobar::Heroku::BuildRequest.new(pipeline, self, ref,
+                                          forced, custom_payload)
+      end
     end
   end
 end

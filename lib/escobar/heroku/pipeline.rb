@@ -92,43 +92,22 @@ module Escobar
       end
 
       # rubocop:disable Metrics/LineLength
-      def create_deployment_from(app, github_deployment, sha, build)
-        case build["id"]
-        when "two_factor"
-          description = "A second factor is required. Use your configured authenticator app or yubikey."
-          create_github_deployment_status(github_deployment["url"], nil, "failure", description)
-          raise ArgumentError, build["message"]
-        when Escobar::UUID_REGEX
-          heroku_build = Escobar::Heroku::Build.new(
-            client, app, build["id"]
-          )
-          heroku_build.github_url = github_deployment["url"]
-          heroku_build.pipeline_name = name
-          heroku_build.sha = sha
-
-          create_github_deployment_status(
-            github_deployment["url"],
-            heroku_build.dashboard_build_output_url,
-            "pending",
-            "Build running.."
-          )
-
-          heroku_build
-        else
-          raise ArgumentError, "Unable to create heroku build for #{name}"
-        end
-      end
-
       def create_deployment(ref, environment, force = false, custom_payload = {})
         app = environments[environment] && environments[environment].last
-        return({ error: "No '#{environment}' environment for #{name}." }) unless app
+        unless app
+          raise ArgumentError, "No '#{environment}' environment for #{name}."
+        end
 
-        github_deployment = create_github_deployment("deploy", ref, environment, force, custom_payload)
-        return({ error: github_deployment["message"] }) unless github_deployment["sha"]
+        heroku_app = app.app
+        if heroku_app.locked?
+          raise ArgumentError, "Application requires second factor: #{heroku_app.name}"
+        end
 
-        sha   = github_deployment["sha"]
-        build = create_heroku_build(app.name, sha)
-        create_deployment_from(app, github_deployment, sha, build)
+        build_request = heroku_app.build_request_for(self, ref, force, custom_payload)
+
+        heroku_build = build_request.create("deploy", environment)
+
+        heroku_build
       end
       # rubocop:enable Metrics/LineLength
 
@@ -158,20 +137,6 @@ module Escobar
 
       def custom_deployment_payload
         { name: name, pipeline: self.to_hash, provider: "slash-heroku" }
-      end
-
-      def create_github_deployment(task, ref, environment, force, extras = {})
-        required_contexts = required_commit_contexts(force)
-
-        options = {
-          ref: ref,
-          task: task,
-          auto_merge: !force,
-          payload: extras.merge(custom_deployment_payload),
-          environment: environment,
-          required_contexts: required_contexts
-        }
-        github_client.create_deployment(options)
       end
 
       def create_github_deployment_status(url, target_url, state, description)
