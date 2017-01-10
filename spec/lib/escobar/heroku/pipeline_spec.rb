@@ -177,7 +177,7 @@ describe Escobar::Heroku::Pipeline do
       pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
       expect { pipeline.create_deployment("master", "production") }
         .to raise_error(
-          ArgumentError,
+          Escobar::Heroku::BuildRequest::Error,
           "Application requires second factor: slash-heroku-production"
         )
     end

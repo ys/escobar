@@ -2,6 +2,17 @@ module Escobar
   module Heroku
     # Class representing a heroku build request
     class BuildRequest
+      # Class representing some failure when requesting a build
+      class Error < StandardError
+        attr_accessor :build_request
+
+        def self.new_from_build_request(build_request, message)
+          error = new(message)
+          error.build_request = build_request
+          error
+        end
+      end
+
       attr_reader :app, :github_deployment_url, :pipeline, :sha
 
       attr_accessor :environment, :ref, :forced, :custom_payload
@@ -11,9 +22,13 @@ module Escobar
         @pipeline = pipeline
       end
 
+      def error_for(message)
+        Error.new_from_build_request(self, message)
+      end
+
       def create(task, environment, ref, forced, custom_payload)
         if app.locked?
-          raise ArgumentError, "Application requires second factor: #{app.name}"
+          raise error_for("Application requires second factor: #{app.name}")
         end
 
         @environment = environment
@@ -27,17 +42,13 @@ module Escobar
       def create_in_api(task)
         create_github_deployment(task)
 
-        unless sha
-          raise ArgumentError, "Unable to create GitHub deployments for " \
-                               "#{github_repository}: #{build['message']}"
-        end
-
         build = create_heroku_build
         if build["id"] =~ Escobar::UUID_REGEX
           process_heroku_build(build)
         else
-          raise ArgumentError, "Unable to create heroku build for " \
-                               "#{app.name}: #{build['message']}"
+          raise error_for(
+            "Unable to create heroku build for #{app.name}: #{build['message']}"
+          )
         end
       end
 
@@ -66,6 +77,19 @@ module Escobar
         app.client.heroku.post("/apps/#{app.name}/builds", body)
       end
 
+      def handle_github_deployment_response(response)
+        unless response["sha"]
+          raise error_for(
+            "Unable to create GitHub deployments for " \
+            "#{github_repository}: #{response['message']}"
+          )
+        end
+
+        @sha = response["sha"]
+        @github_deployment_url = response["url"]
+        response
+      end
+
       def create_github_deployment(task)
         options = {
           ref: ref,
@@ -76,11 +100,7 @@ module Escobar
           required_contexts: required_commit_contexts
         }
         response = github_client.create_deployment(options)
-
-        @sha = response["sha"]
-        @github_deployment_url = response["url"]
-
-        response
+        handle_github_deployment_response(response)
       end
 
       def create_deployment_status(url, payload)
