@@ -85,7 +85,7 @@ module Escobar
         unless response["sha"]
           raise error_for(
             "Unable to create GitHub deployments for " \
-            "#{github_repository}: #{response['message']}"
+            "#{pipeline.github_repository}: #{response['message']}"
           )
         end
 
