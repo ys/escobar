@@ -87,6 +87,9 @@ describe Escobar::Heroku::Pipeline do
       stub_heroku_response("#{pipeline_path}/pipeline-couplings")
       stub_kolkrabbi_response("#{pipeline_path}/repository")
 
+      stub_request(:get, "https://api.heroku.com/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/config-vars")
+        .to_return(status: 200, body: "", headers: {})
+
       response = fixture_data("api.github.com/repos/atmos/slash-heroku/index")
       stub_request(:get, "https://api.github.com/repos/atmos/slash-heroku")
         .with(headers: default_github_headers)
@@ -121,8 +124,9 @@ describe Escobar::Heroku::Pipeline do
 
       pipeline   = Escobar::Heroku::Pipeline.new(client, id, name)
       deployment = pipeline.create_deployment("master", "production")
+
       expect(deployment.id).to eql("01234567-89ab-cdef-0123-456789abcdef")
-      expect(deployment.app_id).to eql("e539d5b3-2ede-4e51-80e3-3b5b47678bf4")
+      expect(deployment.app_id).to eql("b0deddbf-cf56-48e4-8c3a-3ea143be2333")
       expect(deployment.github_url).to eql("https://api.github.com/repos/atmos/slash-heroku/deployments/22062424")
       expect(deployment.dashboard_build_output_url).to eql(
         "https://dashboard.heroku.com/apps/slash-heroku-production/activity/builds/01234567-89ab-cdef-0123-456789abcdef"
@@ -134,7 +138,7 @@ describe Escobar::Heroku::Pipeline do
         sha: "8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b",
         name: "slash-heroku",
         repo: "atmos/slash-heroku",
-        app_id: "e539d5b3-2ede-4e51-80e3-3b5b47678bf4",
+        app_id: "b0deddbf-cf56-48e4-8c3a-3ea143be2333",
         app_name: "slash-heroku-production",
         build_id: "01234567-89ab-cdef-0123-456789abcdef",
         command_id: nil,
@@ -166,30 +170,15 @@ describe Escobar::Heroku::Pipeline do
         .with(headers: default_github_headers)
         .to_return(status: 200, body: response, headers: {})
 
-      tarball_headers = {
-        "Location": "https://codeload.github.com/atmos/slash-heroku/legacy.tar.gz/8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b"
-      }
-      stub_request(:head, "https://api.github.com/repos/atmos/slash-heroku/tarball/8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b")
-        .with(headers: default_github_headers)
-        .to_return(status: 200, body: nil, headers: tarball_headers)
-
       response = fixture_data("api.heroku.com/failed-2fa")
-      stub_request(:post, "https://api.heroku.com/apps/slash-heroku-production/builds")
-        .with(body: "{\"source_blob\":{\"url\":\"https://codeload.github.com/atmos/slash-heroku/legacy.tar.gz/8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\",\"version\":\"81157927\",\"version_description\":\"atmos/slash-heroku:8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\"}}")
+      stub_request(:get, "https://api.heroku.com/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/config-vars")
         .to_return(status: 403, body: response, headers: {})
-
-      response = fixture_data("api.github.com/repos/atmos/slash-heroku/deployments/22062424/statuses/pending-1")
-      stub_request(:post, "https://api.github.com/repos/atmos/slash-heroku/deployments/22062424/statuses")
-        .with(headers: default_github_headers)
-        .to_return(status: 200, body: response, headers: {})
 
       pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
       expect { pipeline.create_deployment("master", "production") }
         .to raise_error(
-          ArgumentError,
-          "A second authentication factor or pre-authorization is required " \
-          "for this request. Your account has either two-factor or a YubiKey " \
-          "registered."
+          Escobar::Heroku::BuildRequest::Error,
+          "Application requires second factor: slash-heroku-production"
         )
     end
     # rubocop:enable Metrics/LineLength
