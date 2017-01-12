@@ -91,14 +91,17 @@ module Escobar
         end
       end
 
-      # rubocop:disable Metrics/LineLength
-      def create_deployment(ref, environment, force = false, custom_payload = {})
+      def default_heroku_application_name(environment)
         app = environments[environment] && environments[environment].last
         unless app
           raise ArgumentError, "No '#{environment}' environment for #{name}."
         end
+        app.app
+      end
 
-        heroku_app = app.app
+      # rubocop:disable Metrics/LineLength
+      def create_deployment(ref, environment, force = false, custom_payload = {})
+        heroku_app = default_heroku_application_name(environment)
 
         build_request = heroku_app.build_request_for(self)
         heroku_build = build_request.create(
