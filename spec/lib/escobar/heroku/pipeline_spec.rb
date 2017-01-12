@@ -79,6 +79,18 @@ describe Escobar::Heroku::Pipeline do
       expect(pipeline.required_commit_contexts).to eql(["continuous-integration/travis-ci/push"])
     end
 
+    it "returns a default heroku application name to deploy for a stage" do
+      pipeline_path = "/pipelines/#{id}"
+      stub_heroku_response(pipeline_path)
+      stub_heroku_response("#{pipeline_path}/pipeline-couplings")
+      stub_heroku_response("/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333")
+      stub_kolkrabbi_response("#{pipeline_path}/repository")
+
+      pipeline = Escobar::Heroku::Pipeline.new(client, id, name)
+      expect(pipeline.default_heroku_application("production").name)
+        .to eql("slash-heroku-production")
+    end
+
     it "create_deployment deploys a master branch" do
       pipeline_path = "/pipelines/#{id}"
       stub_heroku_response("/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333")
