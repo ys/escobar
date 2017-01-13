@@ -78,7 +78,7 @@ module Escobar
         body = {
           source_blob: {
             url: github_client.archive_link(sha),
-            version: sha[0..7],
+            version: sha,
             version_description: "#{pipeline.github_repository}:#{sha}"
           }
         }
