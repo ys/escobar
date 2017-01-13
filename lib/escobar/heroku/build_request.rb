@@ -30,6 +30,10 @@ module Escobar
         Error.new_from_build_request(self, message)
       end
 
+      def cache_key
+        "escobar-build-request-#{app.name}"
+      end
+
       def create(task, environment, ref, forced, custom_payload)
         if app.locked?
           raise error_for("Application requires second factor: #{app.name}")

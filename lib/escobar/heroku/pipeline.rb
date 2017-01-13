@@ -91,23 +91,24 @@ module Escobar
         end
       end
 
-      # rubocop:disable Metrics/LineLength
-      def create_deployment(ref, environment, force = false, custom_payload = {})
+      def default_heroku_application(environment)
         app = environments[environment] && environments[environment].last
         unless app
           raise ArgumentError, "No '#{environment}' environment for #{name}."
         end
+        app.app
+      end
 
-        heroku_app = app.app
+      def create_deployment(ref, environment, force = false, payload = {})
+        heroku_app = default_heroku_application(environment)
 
         build_request = heroku_app.build_request_for(self)
         heroku_build = build_request.create(
-          "deploy", environment, ref, force, custom_payload
+          "deploy", environment, ref, force, payload
         )
 
         heroku_build
       end
-      # rubocop:enable Metrics/LineLength
 
       def get(path)
         response = kolkrabbi_client.get do |request|
@@ -144,17 +145,6 @@ module Escobar
           description: description
         }
         create_deployment_status(url, payload)
-      end
-
-      def create_heroku_build(app_name, sha)
-        body = {
-          source_blob: {
-            url: github_client.archive_link(sha),
-            version: sha[0..7],
-            version_description: "#{github_repository}:#{sha}"
-          }
-        }
-        client.heroku.post("/apps/#{app_name}/builds", body)
       end
 
       def github_client
