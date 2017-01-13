@@ -126,7 +126,7 @@ describe Escobar::Heroku::Pipeline do
 
       response = fixture_data("api.heroku.com/apps/slash-heroku-production/builds")
       stub_request(:post, "https://api.heroku.com/apps/slash-heroku-production/builds")
-        .with(body: "{\"source_blob\":{\"url\":\"https://codeload.github.com/atmos/slash-heroku/legacy.tar.gz/8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\",\"version\":\"81157927\",\"version_description\":\"atmos/slash-heroku:8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\"}}")
+        .with(body: "{\"source_blob\":{\"url\":\"https://codeload.github.com/atmos/slash-heroku/legacy.tar.gz/8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\",\"version\":\"8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\",\"version_description\":\"atmos/slash-heroku:8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b\"}}")
         .to_return(status: 200, body: response, headers: {})
 
       response = fixture_data("api.github.com/repos/atmos/slash-heroku/deployments/22062424/statuses/pending-1")
