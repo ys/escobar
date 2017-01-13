@@ -31,7 +31,7 @@ module Escobar
       end
 
       def cache_key
-        Digest::SHA1.hexdigest("escobar-build-request-#{app.name}")
+        "escobar-build-request-#{app.name}"
       end
 
       def create(task, environment, ref, forced, custom_payload)
