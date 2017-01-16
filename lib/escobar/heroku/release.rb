@@ -30,7 +30,7 @@ module Escobar
       end
 
       def repository
-        github_url.match(repository_regex)[1]
+        github_url && github_url.match(repository_regex)[1]
       end
 
       def repository_regex
