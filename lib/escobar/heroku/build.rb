@@ -23,6 +23,14 @@ module Escobar
         info["status"]
       end
 
+      def releasing?
+        status == "succeeded" && release_id
+      end
+
+      def release_id
+        info["release"]["id"]
+      end
+
       def app
         @app ||= Escobar::Heroku::App.new(client, app_id)
       end

@@ -84,10 +84,20 @@ module Escobar
       end
 
       def reap_build(app_id, build_id)
-        info = client.heroku.get("/apps/#{app_id}/builds/#{build_id}")
-        case info["status"]
+        build = Escobar::Heroku::Build.new(client, app_id, build_id)
+        case build.status
         when "succeeded", "failed"
-          info
+          build
+        end
+      end
+
+      def reap_release(app_id, build_id, release_id)
+        release = Escobar::Heroku::Release.new(
+          client, app_id, build_id, release_id
+        )
+        case release.status
+        when "succeeded", "failed"
+          release
         end
       end
 
