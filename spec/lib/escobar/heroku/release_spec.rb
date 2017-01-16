@@ -34,12 +34,13 @@ describe Escobar::Heroku::Release do
   it "looks at a release" do
     release = Escobar::Heroku::Release.new(
       client,
-      app,
+      app.id,
       "b80207dc-139f-4546-aedc-985d9cfcafab",
       "23fe935d-88c8-4fd0-b035-10d44f3d9059"
     )
 
     expect(release.id).to eql("23fe935d-88c8-4fd0-b035-10d44f3d9059")
     expect(release.status).to eql("succeeded")
+    expect(release.build.status).to eql("succeeded")
   end
 end

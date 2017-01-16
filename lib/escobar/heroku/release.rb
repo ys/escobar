@@ -9,24 +9,27 @@ module Escobar
       attr_accessor :pipeline_name
       attr_accessor :sha
 
-      def initialize(client, app, build_id, id)
-        @id            = id
-        @app_id        = app.id
-        @app_name      = app.name
-        @build_id      = build_id
-        @client        = client
+      def initialize(client, app_id, build_id, id)
+        @id       = id
+        @app_id   = app_id
+        @build_id = build_id
+        @client   = client
       end
 
       def info
         @info ||= client.heroku.get("/apps/#{app_id}/releases/#{id}")
       end
 
+      def app
+        @app ||= Escobar::Heroku::App.new(client, app_id)
+      end
+
       def build
-        @build ||= Escobar::Heroku::Build.new(client, app, build_id)
+        @build ||= Escobar::Heroku::Build.new(client, app.id, build_id)
       end
 
       def dashboard_build_output_url
-        "https://dashboard.heroku.com/apps/#{app_name}/activity/builds/#{id}"
+        "https://dashboard.heroku.com/apps/#{app.name}/activity/builds/#{id}"
       end
 
       def repository

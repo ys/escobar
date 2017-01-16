@@ -26,7 +26,7 @@ describe Escobar::Heroku::Build do
     expect(app.name).to eql("slash-heroku-production")
 
     build = Escobar::Heroku::Build.new(
-      client, app, "b80207dc-139f-4546-aedc-985d9cfcafab"
+      client, app.id, "b80207dc-139f-4546-aedc-985d9cfcafab"
     )
     build.github_url = \
       "https://api.github.com/repos/atmos/slash-heroku/deployments/9876543210"

@@ -31,7 +31,7 @@ module Escobar
       end
 
       def build_request_for(pipeline)
-        Escobar::Heroku::BuildRequest.new(pipeline, self)
+        Escobar::Heroku::BuildRequest.new(pipeline, id)
       end
     end
   end
