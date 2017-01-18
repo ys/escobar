@@ -35,7 +35,7 @@ module Escobar
       end
 
       def cache_key
-        "escobar-build-request-#{app.name}"
+        app.cache_key
       end
 
       def create(task, environment, ref, forced, custom_payload)
