@@ -24,7 +24,7 @@ module Escobar
       end
 
       def releasing?
-        status == "succeeded" && release_id
+        status == "succeeded" && !release_id.nil?
       end
 
       def release_id
