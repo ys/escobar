@@ -102,7 +102,7 @@ module Escobar
       end
 
       def default_heroku_application(environment)
-        app = environments[environment] && environments[environment].last
+        app = environments[environment] && environments[environment].first
         unless app
           raise ArgumentError, "No '#{environment}' environment for #{name}."
         end
