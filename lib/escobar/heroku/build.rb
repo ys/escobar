@@ -35,7 +35,7 @@ module Escobar
       def to_job_json
         {
           sha: sha,
-          name: pipeline_name,
+          pipeline_name: pipeline_name,
           repo: repository,
           app_id: app_id,
           app_name: app_name,
