@@ -157,6 +157,24 @@ describe Escobar::Heroku::Pipeline do
         target_url: deployment.dashboard_build_output_url,
         deployment_url: deployment.github_url
       )
+
+      app_path = "/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333"
+      stub_heroku_response(
+        "#{app_path}/builds/01234567-89ab-cdef-0123-456789abcdef"
+      )
+      build = pipeline.reap_build(
+        deployment.app_id, deployment.id
+      )
+      expect(build.status).to eql("succeeded")
+      expect(build).to be_releasing
+
+      stub_heroku_response(
+        "#{app_path}/releases/23fe935d-88c8-4fd0-b035-10d44f3d9059"
+      )
+      release = pipeline.reap_release(
+        build.app_id, build.id, build.release_id
+      )
+      expect(release.status).to eql("succeeded")
     end
 
     it "create_deployment errors on two factor requirements for apps" do

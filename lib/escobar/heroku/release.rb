@@ -1,60 +1,58 @@
 module Escobar
   module Heroku
-    # Class representing a heroku build
-    class Build
-      attr_reader :app_id, :client, :id
+    # Class representing a heroku release
+    class Release
+      attr_reader :app_id, :app_name, :build_id, :client, :id
 
       attr_accessor :command_id
       attr_accessor :github_url
       attr_accessor :pipeline_name
       attr_accessor :sha
 
-      def initialize(client, app_id, id)
-        @id            = id
-        @app_id        = app_id
-        @client        = client
+      def initialize(client, app_id, build_id, id)
+        @id       = id
+        @app_id   = app_id
+        @build_id = build_id
+        @client   = client
       end
 
       def info
-        @info ||= client.heroku.get("/apps/#{app_id}/builds/#{id}")
-      end
-
-      def status
-        info["status"]
-      end
-
-      def releasing?
-        status == "succeeded" && !release_id.nil?
-      end
-
-      def release_id
-        info["release"]["id"]
+        @info ||= client.heroku.get("/apps/#{app_id}/releases/#{id}")
       end
 
       def app
         @app ||= Escobar::Heroku::App.new(client, app_id)
       end
 
-      def dashboard_build_output_url
-        "https://dashboard.heroku.com/apps/#{app.name}/activity/builds/#{id}"
+      def build
+        @build ||= Escobar::Heroku::Build.new(client, app.id, build_id)
       end
 
-      def repository_regex
-        %r{https:\/\/api\.github\.com\/repos\/([-_\.0-9a-z]+\/[-_\.0-9a-z]+)}
+      def dashboard_build_output_url
+        "https://dashboard.heroku.com/apps/#{app.name}/activity/builds/#{id}"
       end
 
       def repository
         github_url && github_url.match(repository_regex)[1]
       end
 
+      def repository_regex
+        %r{https:\/\/api\.github\.com\/repos\/([-_\.0-9a-z]+\/[-_\.0-9a-z]+)}
+      end
+
+      def status
+        info["status"]
+      end
+
       def to_job_json
         {
           sha: sha,
-          pipeline_name: pipeline_name,
+          name: pipeline_name,
           repo: repository,
           app_id: app_id,
-          app_name: app.name,
-          build_id: id,
+          app_name: app_name,
+          build_id: build_id,
+          release_id: id,
           command_id: command_id,
           target_url: dashboard_build_output_url,
           deployment_url: github_url

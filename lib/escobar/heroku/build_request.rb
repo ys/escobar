@@ -17,13 +17,17 @@ module Escobar
         end
       end
 
-      attr_reader :app, :github_deployment_url, :pipeline, :sha
+      attr_reader :app_id, :github_deployment_url, :pipeline, :sha
 
       attr_accessor :environment, :ref, :forced, :custom_payload
 
-      def initialize(pipeline, app)
-        @app      = app
+      def initialize(pipeline, app_id)
+        @app_id   = app_id
         @pipeline = pipeline
+      end
+
+      def app
+        @app ||= Escobar::Heroku::App.new(pipeline.client, app_id)
       end
 
       def error_for(message)
@@ -31,7 +35,7 @@ module Escobar
       end
 
       def cache_key
-        "escobar-build-request-#{app.name}"
+        app.cache_key
       end
 
       def create(task, environment, ref, forced, custom_payload)
@@ -62,7 +66,7 @@ module Escobar
 
       def process_heroku_build(build)
         heroku_build = Escobar::Heroku::Build.new(
-          app.client, app, build["id"]
+          pipeline.client, app_id, build["id"]
         )
 
         create_github_pending_deployment_status(heroku_build)

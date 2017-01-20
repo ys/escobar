@@ -60,4 +60,9 @@ describe Escobar::Heroku::App do
       .to_return(status: 200, body: { "RACK_ENV": "production" }.to_json)
     expect(app).to_not be_locked
   end
+
+  it "has a unique cache key" do
+    expect(app.cache_key)
+      .to eql("escobar-app-b0deddbf-cf56-48e4-8c3a-3ea143be2333")
+  end
 end
