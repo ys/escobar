@@ -113,3 +113,6 @@ Rails:
   Enabled: true
 Rails/Delegate:
   Enabled: false # delegate isn't available outside of rails?
+BlockLength:
+  Exclude:
+    - 'spec/**/*'

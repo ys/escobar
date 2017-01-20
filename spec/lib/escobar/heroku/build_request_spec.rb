@@ -20,6 +20,6 @@ describe Escobar::Heroku::App do
   it "has a unique cache key" do
     build_request = app.build_request_for(pipeline)
     expect(build_request.cache_key)
-      .to eql("escobar-build-request-slash-heroku-production")
+      .to eql("escobar-app-b0deddbf-cf56-48e4-8c3a-3ea143be2333")
   end
 end

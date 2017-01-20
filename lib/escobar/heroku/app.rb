@@ -20,6 +20,10 @@ module Escobar
         "https://dashboard.heroku.com/apps/#{name}"
       end
 
+      def cache_key
+        "escobar-app-#{id}"
+      end
+
       # Accepts either google authenticator or yubikey second_factor formatting
       def preauth(second_factor)
         !client.heroku.put("/apps/#{id}/pre-authorizations", second_factor).any?
@@ -31,7 +35,7 @@ module Escobar
       end
 
       def build_request_for(pipeline)
-        Escobar::Heroku::BuildRequest.new(pipeline, self)
+        Escobar::Heroku::BuildRequest.new(pipeline, id)
       end
     end
   end
