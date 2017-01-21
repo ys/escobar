@@ -148,7 +148,7 @@ describe Escobar::Heroku::Pipeline do
       expect(deployment.pipeline_name).to eql("slash-heroku")
       expect(deployment.to_job_json).to eql(
         sha: "8115792777a8d60fcf1c5e181ce3c3bc34e5eb1b",
-        name: "slash-heroku",
+        pipeline_name: "slash-heroku",
         repo: "atmos/slash-heroku",
         app_id: "b0deddbf-cf56-48e4-8c3a-3ea143be2333",
         app_name: "slash-heroku-production",
