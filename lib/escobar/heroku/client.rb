@@ -15,6 +15,10 @@ module Escobar
         inspected
       end
 
+      def user_information
+        get("/account")
+      end
+
       def get(path, version = 3)
         response = client.get do |request|
           request.url path
