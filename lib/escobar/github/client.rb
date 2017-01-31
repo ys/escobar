@@ -92,6 +92,8 @@ module Escobar
           request.headers["Accept"] = accept_headers
           request.headers["Content-Type"] = "application/json"
           request.headers["Authorization"] = "token #{token}"
+          request.options.timeout = 5
+          request.options.open_timeout = 2
         end
       end
 
@@ -101,6 +103,8 @@ module Escobar
           request.headers["Accept"] = accept_headers
           request.headers["Content-Type"] = "application/json"
           request.headers["Authorization"] = "token #{token}"
+          request.options.timeout = 5
+          request.options.open_timeout = 2
           request.body = body.to_json
         end
 
