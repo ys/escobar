@@ -65,4 +65,14 @@ describe Escobar::Heroku::App do
     expect(app.cache_key)
       .to eql("escobar-app-b0deddbf-cf56-48e4-8c3a-3ea143be2333")
   end
+
+  it "lists releases" do
+    path = "/apps/b0deddbf-cf56-48e4-8c3a-3ea143be2333/releases"
+    stub_request(:get, "https://api.heroku.com#{path}")
+      .with(headers: default_heroku_headers)
+      .to_return(
+        status: 200, body: fixture_data("api.heroku.com#{path}")
+      )
+    expect(app.releases.size).to eql(25)
+  end
 end
