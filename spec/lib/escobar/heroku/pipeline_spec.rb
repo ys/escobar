@@ -112,7 +112,7 @@ describe Escobar::Heroku::Pipeline do
         .with(headers: default_github_headers)
         .to_return(status: 200, body: response, headers: {})
 
-      response = fixture_data("api.github.com/repos/atmos/slash-heroku/deployments")
+      response = fixture_data("api.github.com/repos/atmos/slash-heroku/deployments/22062424")
       stub_request(:post, "https://api.github.com/repos/atmos/slash-heroku/deployments")
         .with(headers: default_github_headers)
         .to_return(status: 200, body: response, headers: {})

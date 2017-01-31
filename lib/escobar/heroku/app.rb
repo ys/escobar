@@ -16,6 +16,18 @@ module Escobar
         @info ||= client.heroku.get("/apps/#{id}")
       end
 
+      def releases_json
+        @releases_json ||= client.heroku.get_range(
+          "/apps/#{id}/releases", "version; order=desc,max=25;"
+        )
+      end
+
+      def releases
+        @releases ||= releases_json.map do |release|
+          Escobar::Heroku::Release.new(client, id, nil, release["id"])
+        end
+      end
+
       def dashboard_url
         "https://dashboard.heroku.com/apps/#{name}"
       end
