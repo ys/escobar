@@ -15,13 +15,14 @@ module Escobar
         inspected
       end
 
+      def user_information
+        get("/account")
+      end
+
       def get(path, version = 3)
         response = client.get do |request|
           request.url path
-          request.headers["Accept"] = heroku_accept_header(version)
-          request.headers["Accept-Encoding"] = ""
-          request.headers["Content-Type"]    = "application/json"
-          request.headers["Authorization"]   = "Bearer #{token}"
+          request_defaults(request, version)
         end
 
         JSON.parse(response.body)
@@ -32,11 +33,8 @@ module Escobar
       def get_range(path, range, version = 3)
         response = client.get do |request|
           request.url path
-          request.headers["Accept"] = heroku_accept_header(version)
-          request.headers["Accept-Encoding"] = ""
-          request.headers["Content-Type"]    = "application/json"
-          request.headers["Authorization"]   = "Bearer #{token}"
-          request.headers["Range"]           = range
+          request_defaults(request, version)
+          request.headers["Range"] = range
         end
 
         JSON.parse(response.body)
@@ -47,12 +45,7 @@ module Escobar
       def post(path, body)
         response = client.post do |request|
           request.url path
-          request.headers["Accept"] = heroku_accept_header(3)
-          request.headers["Accept-Encoding"] = ""
-          request.headers["Content-Type"]    = "application/json"
-          if token
-            request.headers["Authorization"] = "Bearer #{token}"
-          end
+          request_defaults(request)
           request.body = body.to_json
         end
 
@@ -64,10 +57,7 @@ module Escobar
       def put(path, second_factor = nil)
         response = client.put do |request|
           request.url path
-          request.headers["Accept"] = heroku_accept_header(3)
-          request.headers["Accept-Encoding"] = ""
-          request.headers["Content-Type"]    = "application/json"
-          request.headers["Authorization"]   = "Bearer #{token}"
+          request_defaults(request)
           if second_factor
             request.headers["Heroku-Two-Factor-Code"] = second_factor
           end
@@ -79,6 +69,17 @@ module Escobar
       end
 
       private
+
+      def request_defaults(request, version = 3)
+        request.headers["Accept"]          = heroku_accept_header(version)
+        request.headers["Accept-Encoding"] = ""
+        request.headers["Content-Type"]    = "application/json"
+        if token
+          request.headers["Authorization"] = "Bearer #{token}"
+        end
+        request.options.timeout = 5
+        request.options.open_timeout = 2
+      end
 
       def heroku_accept_header(version)
         "application/vnd.heroku+json; version=#{version}"
