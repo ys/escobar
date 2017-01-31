@@ -121,4 +121,18 @@ describe Escobar::GitHub::Client do
     end
   end
   # rubocop:enable Metrics/LineLength
+
+  describe "#deployments" do
+    it "returns an array of deployments" do
+      deploy_url = "https://api.github.com/repos/atmos/slash-heroku/deployments"
+      response = fixture_data(
+        "api.github.com/repos/atmos/slash-heroku/deployments"
+      )
+      stub_request(:get, deploy_url)
+        .with(headers: default_github_headers)
+        .to_return(status: 200, body: response, headers: {})
+
+      expect(slash_heroku.deployments).to_not be_empty
+    end
+  end
 end

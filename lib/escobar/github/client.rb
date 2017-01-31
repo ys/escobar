@@ -47,6 +47,12 @@ module Escobar
         JSON.parse(response.body)["default_branch"]
       end
 
+      def deployments
+        response = http_method(:get, "/repos/#{name_with_owner}/deployments")
+        not_found unless response.status == 200
+        JSON.parse(response.body)
+      end
+
       def create_deployment(options)
         body = {
           ref: options[:ref] || "master",
