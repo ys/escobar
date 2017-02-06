@@ -28,6 +28,10 @@ module Escobar
         end
       end
 
+      def dynos
+        @dynos ||= Escobar::Heroku::Dynos.new(client, id)
+      end
+
       def dashboard_url
         "https://dashboard.heroku.com/apps/#{name}"
       end
