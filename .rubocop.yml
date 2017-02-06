@@ -116,3 +116,4 @@ Rails/Delegate:
 BlockLength:
   Exclude:
     - 'spec/**/*'
+    - '*.gemspec'
