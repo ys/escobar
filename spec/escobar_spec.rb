@@ -12,4 +12,8 @@ describe Escobar do
   it "fetches the Heroku token from $NETRC" do
     expect(Escobar.heroku_api_token).not_to be nil
   end
+
+  it "knows if zipkin is enabled" do
+    expect(Escobar.zipkin_enabled?).to be false
+  end
 end

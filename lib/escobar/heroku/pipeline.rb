@@ -131,11 +131,31 @@ module Escobar
       end
 
       def kolkrabbi_client
-        @kolkrabbi ||= Faraday.new(url: "https://#{ENV['KOLKRABBI_HOSTNAME']}")
+        @kolkrabbi ||= if Escobar.zipkin_enabled?
+                         kolkrabbi_zipkin_client
+                       else
+                         kolkrabbi_default_client
+                       end
+      end
+
+      def kolkrabbi_zipkin_client
+        Faraday.new(url: "https://#{kolkrabbi_hostname}") do |c|
+          c.use :instrumentation
+          c.use ZipkinTracer::FaradayHandler, kolkrabbi_hostname
+          c.adapter Faraday.default_adapter
+        end
+      end
+
+      def kolkrabbi_default_client
+        Faraday.new(url: "https://#{kolkrabbi_hostname}")
       end
 
       def create_deployment_status(url, payload)
         github_client.create_deployment_status(url, payload)
+      end
+
+      def kolkrabbi_hostname
+        ENV.fetch("KOLKRABBI_HOSTNAME", "kolkrabbi.heroku.com")
       end
 
       private

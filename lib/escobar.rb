@@ -44,6 +44,10 @@ module Escobar
   def self.github_api_token
     netrc["api.github.com"]["password"]
   end
+
+  def self.zipkin_enabled?
+    !ENV["ZIPKIN_SERVICE_NAME"].nil? && !ENV["ZIPKIN_API_HOST"].nil?
+  end
 end
 
 require_relative "./escobar/client"
