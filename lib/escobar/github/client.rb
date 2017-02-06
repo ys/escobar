@@ -116,7 +116,19 @@ module Escobar
       private
 
       def client
-        @client ||= Faraday.new(url: "https://api.github.com")
+        @client ||= Escobar.zipkin_enabled? ? zipkin_client : default_client
+      end
+
+      def zipkin_client
+        Faraday.new(url: "https://api.github.com") do |c|
+          c.use :instrumentation
+          c.use ZipkinTracer::FaradayHandler, "api.github.com"
+          c.adapter Faraday.default_adapter
+        end
+      end
+
+      def default_client
+        Faraday.new(url: "https://api.github.com")
       end
     end
   end
